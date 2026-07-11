@@ -1,0 +1,24 @@
+{
+  "name": "The Corner Grind",
+  "short_name": "Corner Grind",
+  "description": "Skip the queue. Your coffee, ready when you are.",
+  "start_url": "/corner-grind?src=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "theme_color": "#6F4E37",
+  "background_color": "#F6EBDF",
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}
