@@ -1,9 +1,11 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useSyncExternalStore } from "react"
 import { t } from "@/lib/i18n"
 import { formatMinor } from "@/lib/money"
 import { cartCount, cartTotalMinor, useCart } from "@/store/cart"
+
+const emptySubscribe = () => () => {}
 
 /** Floating "view order" bar shown while the cart has items. */
 export function CartBar({
@@ -15,9 +17,12 @@ export function CartBar({
 }) {
   const lines = useCart((state) => state.lines)
   // The cart is restored from localStorage on the client, so skip the first
-  // server-rendered frame to avoid a hydration mismatch.
-  const [mounted, setMounted] = useState(false)
-  useEffect(() => setMounted(true), [])
+  // (server-matching) hydration frame to avoid a mismatch.
+  const mounted = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  )
 
   const count = cartCount(lines)
   if (!mounted || count === 0) return null

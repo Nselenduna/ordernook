@@ -14,8 +14,11 @@ export function isPushSupported(): boolean {
   )
 }
 
-/** VAPID keys are URL-safe base64; PushManager wants raw bytes. */
-export function urlBase64ToUint8Array(base64String: string): Uint8Array {
+/** VAPID keys are URL-safe base64; PushManager wants raw bytes.
+ * (Explicit Uint8Array<ArrayBuffer> so TS accepts it as a BufferSource.) */
+export function urlBase64ToUint8Array(
+  base64String: string
+): Uint8Array<ArrayBuffer> {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4)
   const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/")
   const rawData = window.atob(base64)

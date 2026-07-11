@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import type { CSSProperties } from "react"
 import { CheckIcon } from "lucide-react"
 import { toast } from "sonner"
@@ -102,28 +102,24 @@ function OptionGroupSection({
   )
 }
 
-export function ItemSheet({
+/**
+ * Holds the customisation form state. Mounted with key={item.id} so opening
+ * a different item starts from a fresh state (no reset effect needed).
+ */
+function ItemSheetBody({
   item,
   currency,
-  brandVars,
-  onClose,
+  onDone,
 }: {
-  item: MenuItemWithGroups | null
+  item: MenuItemWithGroups
   currency: string
-  brandVars: CSSProperties
-  onClose: () => void
+  onDone: () => void
 }) {
   const addToCart = useCart((state) => state.add)
-  const [selections, setSelections] = useState<Selections>({})
+  const [selections, setSelections] = useState<Selections>(() =>
+    initialSelections(item)
+  )
   const [qty, setQty] = useState(1)
-
-  // Reset the form whenever a different item is opened.
-  useEffect(() => {
-    if (item) {
-      setSelections(initialSelections(item))
-      setQty(1)
-    }
-  }, [item])
 
   const toggleOption = (group: OptionGroupWithOptions, optionId: string) => {
     setSelections((prev) => {
@@ -146,14 +142,6 @@ export function ItemSheet({
 
   const { unitPriceMinor, optionIds, optionNames, requiredMet } =
     useMemo(() => {
-      if (!item) {
-        return {
-          unitPriceMinor: 0,
-          optionIds: [] as string[],
-          optionNames: [] as string[],
-          requiredMet: true,
-        }
-      }
       let price = item.price_minor
       const ids: string[] = []
       const names: string[] = []
@@ -178,7 +166,7 @@ export function ItemSheet({
     }, [item, selections])
 
   const handleAdd = () => {
-    if (!item || !requiredMet) return
+    if (!requiredMet) return
     addToCart({
       item_id: item.id,
       name: item.name,
@@ -188,9 +176,61 @@ export function ItemSheet({
       unit_price_minor: unitPriceMinor,
     })
     toast.success(t("menu.added"))
-    onClose()
+    onDone()
   }
 
+  return (
+    <>
+      <SheetHeader className="pb-2">
+        <SheetTitle className="font-heading text-2xl">{item.name}</SheetTitle>
+        <SheetDescription>
+          {item.description ?? t("menu.customise")}
+        </SheetDescription>
+      </SheetHeader>
+
+      <div className="flex flex-col gap-5 px-4 pb-4">
+        {item.option_groups.map((group) => (
+          <OptionGroupSection
+            key={group.id}
+            group={group}
+            selected={selections[group.id] ?? []}
+            currency={currency}
+            onToggle={(optionId) => toggleOption(group, optionId)}
+          />
+        ))}
+
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-semibold">{t("menu.qty")}</span>
+          <QtyStepper qty={qty} onChange={setQty} />
+        </div>
+
+        <Button
+          type="button"
+          size="lg"
+          className="h-12 w-full rounded-full text-base"
+          disabled={!requiredMet}
+          onClick={handleAdd}
+        >
+          {t("menu.addToOrder", {
+            total: formatMinor(unitPriceMinor * qty, currency),
+          })}
+        </Button>
+      </div>
+    </>
+  )
+}
+
+export function ItemSheet({
+  item,
+  currency,
+  brandVars,
+  onClose,
+}: {
+  item: MenuItemWithGroups | null
+  currency: string
+  brandVars: CSSProperties
+  onClose: () => void
+}) {
   return (
     <Sheet open={item !== null} onOpenChange={(open) => !open && onClose()}>
       {/* theme-latte + brand vars must be re-applied: sheets portal to <body>,
@@ -201,45 +241,12 @@ export function ItemSheet({
         style={brandVars}
       >
         {item && (
-          <>
-            <SheetHeader className="pb-2">
-              <SheetTitle className="font-heading text-2xl">
-                {item.name}
-              </SheetTitle>
-              <SheetDescription>
-                {item.description ?? t("menu.customise")}
-              </SheetDescription>
-            </SheetHeader>
-
-            <div className="flex flex-col gap-5 px-4 pb-4">
-              {item.option_groups.map((group) => (
-                <OptionGroupSection
-                  key={group.id}
-                  group={group}
-                  selected={selections[group.id] ?? []}
-                  currency={currency}
-                  onToggle={(optionId) => toggleOption(group, optionId)}
-                />
-              ))}
-
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold">{t("menu.qty")}</span>
-                <QtyStepper qty={qty} onChange={setQty} />
-              </div>
-
-              <Button
-                type="button"
-                size="lg"
-                className="h-12 w-full rounded-full text-base"
-                disabled={!requiredMet}
-                onClick={handleAdd}
-              >
-                {t("menu.addToOrder", {
-                  total: formatMinor(unitPriceMinor * qty, currency),
-                })}
-              </Button>
-            </div>
-          </>
+          <ItemSheetBody
+            key={item.id}
+            item={item}
+            currency={currency}
+            onDone={onClose}
+          />
         )}
       </SheetContent>
     </Sheet>

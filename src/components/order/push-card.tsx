@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import { BellIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { t } from "@/lib/i18n"
@@ -15,23 +15,21 @@ const attachedKey = (token: string) => `oa-push-${token}`
 /**
  * "Get notified when your order is ready" opt-in. Hidden entirely when the
  * browser can't do web push (e.g. iOS Safari outside an installed PWA).
+ *
+ * This card only mounts after the order is fetched client-side, so it never
+ * server-renders — browser APIs are safe to read directly here.
  */
 export function PushCard({ token }: { token: string }) {
   const supabase = useMemo(() => createClient(), [])
-  const [state, setState] = useState<PushState>("idle")
-  const [visible, setVisible] = useState(false)
+  const [state, setState] = useState<PushState>(() =>
+    // Already attached for this order in a previous visit?
+    typeof window !== "undefined" &&
+    window.localStorage.getItem(attachedKey(token))
+      ? "enabled"
+      : "idle"
+  )
 
-  useEffect(() => {
-    if (!isPushSupported()) return
-    if (Notification.permission === "denied") return
-    // Already attached for this order in a previous visit.
-    if (window.localStorage.getItem(attachedKey(token))) {
-      setState("enabled")
-    }
-    setVisible(true)
-  }, [token])
-
-  if (!visible) return null
+  if (!isPushSupported() || Notification.permission === "denied") return null
 
   const enable = async () => {
     setState("working")

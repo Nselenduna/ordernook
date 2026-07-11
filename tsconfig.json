@@ -20,7 +20,10 @@
     ],
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    // Pin @types resolution to this project. Without this, TypeScript walks up
+    // to a stray node_modules on the Desktop and fails on its broken typings.
+    "typeRoots": ["./node_modules/@types"]
   },
   "include": [
     "next-env.d.ts",

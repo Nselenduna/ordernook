@@ -41,11 +41,8 @@ function etaTime(order: OrderView): string {
 }
 
 function lineTotalMinor(line: OrderView["items"][number]): number {
-  const optionsMinor = line.snapshot.options.reduce(
-    (sum, option) => sum + option.price_delta_minor,
-    0
-  );
-  return (line.snapshot.unit_price_minor + optionsMinor) * line.qty;
+  // unit_price_minor already includes option deltas (set by create_order).
+  return line.snapshot.unit_price_minor * line.qty;
 }
 
 export default function OrderStatusPage() {
@@ -56,36 +53,42 @@ export default function OrderStatusPage() {
     "loading"
   );
 
-  const load = useCallback(async () => {
-    const { data, error } = await supabase.rpc("get_order_by_token", {
-      p_token: token,
-    });
-    // A malformed token raises a uuid cast error; an unknown one returns null.
-    if (error || !data) {
-      setPhase("notFound");
-      return;
-    }
-    setOrder(data as unknown as OrderView);
-    setPhase("ready");
-  }, [supabase, token]);
-
-  useEffect(() => {
-    load();
-  }, [load]);
-
-  // Poll while the order is still moving; also refetch when the customer
-  // switches back to this tab (they'll do that when the push arrives).
+  // One effect owns fetching: initial load, then — while the order is still
+  // moving — an 8s poll plus a refetch when the customer switches back to
+  // this tab (they'll do that when the push notification arrives).
   const active = order !== null && !isFinalStatus(order.status);
   useEffect(() => {
-    if (!active) return;
+    let cancelled = false;
+
+    const load = async () => {
+      const { data, error } = await supabase.rpc("get_order_by_token", {
+        p_token: token,
+      });
+      if (cancelled) return;
+      // A malformed token raises a uuid cast error; an unknown one returns null.
+      if (error || !data) {
+        setPhase("notFound");
+        return;
+      }
+      setOrder(data as unknown as OrderView);
+      setPhase("ready");
+    };
+
+    load();
+    if (!active) {
+      return () => {
+        cancelled = true;
+      };
+    }
     const interval = setInterval(load, POLL_MS);
     const onFocus = () => load();
     window.addEventListener("focus", onFocus);
     return () => {
+      cancelled = true;
       clearInterval(interval);
       window.removeEventListener("focus", onFocus);
     };
-  }, [active, load]);
+  }, [supabase, token, active]);
 
   useEffect(() => {
     if (order) {
