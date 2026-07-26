@@ -21,6 +21,7 @@ export function parseBranding(json: Json | null | undefined): Branding {
     accent: str(raw.accent),
     background: str(raw.background),
     tagline: str(raw.tagline),
+    logo_url: str(raw.logo_url),
   }
 }
 

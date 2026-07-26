@@ -9,6 +9,7 @@ export type Branding = {
   accent?: string
   background?: string
   tagline?: string
+  logo_url?: string
 }
 
 // ---- Menu tree as fetched on the shop page (shop → categories → items → groups → options)
