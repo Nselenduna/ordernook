@@ -155,6 +155,25 @@ const dict = {
   "nav.menu": "Menu",
   "nav.settings": "Settings",
   "nav.qr": "QR code",
+  "nav.profile": "Profile",
+
+  // Dashboard shop profile (name, tagline, brand colour, logo)
+  "profile.title": "Shop profile",
+  "profile.name": "Shop name",
+  "profile.tagline": "Tagline",
+  "profile.taglinePlaceholder": "e.g. Skip the queue.",
+  "profile.brandColour": "Brand colour",
+  "profile.brandColourHint": "Used for buttons and highlights on your customer page.",
+  "profile.contrastWarning": "Too light — white button text won't be readable. Pick a darker shade.",
+  "profile.logo": "Logo",
+  "profile.logoHint": "Square works best. Shown on your page and as your app icon.",
+  "profile.uploadLogo": "Upload logo",
+  "profile.uploading": "Uploading…",
+  "profile.save": "Save",
+  "profile.saved": "Saved.",
+  "profile.saveFailed": "Couldn't save — try again.",
+  "profile.logoTooLarge": "That image is over 4MB — pick a smaller one.",
+  "profile.logoFailed": "Logo upload failed — try again.",
 
   // Dashboard QR code panel + printable poster
   "qr.title": "Your QR code",

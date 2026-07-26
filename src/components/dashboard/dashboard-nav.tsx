@@ -8,13 +8,14 @@ import { createClient } from "@/lib/supabase/client"
 import { cn } from "@/lib/utils"
 import type { Tables } from "@/lib/database.types"
 
-type Section = "orders" | "menu" | "settings" | "qr"
+type Section = "orders" | "menu" | "settings" | "qr" | "profile"
 
 const LINKS: { id: Section; href: string; label: string }[] = [
   { id: "orders", href: "/dashboard", label: t("nav.orders") },
   { id: "menu", href: "/dashboard/menu", label: t("nav.menu") },
   { id: "settings", href: "/dashboard/settings", label: t("nav.settings") },
   { id: "qr", href: "/dashboard/qr", label: t("nav.qr") },
+  { id: "profile", href: "/dashboard/profile", label: t("nav.profile") },
 ]
 
 export function DashboardNav({
