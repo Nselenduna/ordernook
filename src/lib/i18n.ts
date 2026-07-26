@@ -139,6 +139,15 @@ const dict = {
   "menu.updateFailed": "Couldn't update — try again.",
   "menu.emptyMenu": "No menu items yet.",
 
+  // Dashboard settings
+  "settings.acceptingOrders": "Accepting orders",
+  "settings.acceptingOn": "Customers can order now.",
+  "settings.acceptingOff": "Ordering is paused — the shop page shows a paused message.",
+  "settings.prepTime": "Prep time (minutes)",
+  "settings.prepHint": "Shown to customers as the estimated ready time.",
+  "settings.saved": "Saved.",
+  "settings.saveFailed": "Couldn't save — try again.",
+
   // Dashboard nav
   "nav.orders": "Orders",
   "nav.menu": "Menu",
