@@ -199,6 +199,23 @@ function ItemSheetBody({
           />
         ))}
 
+        <section className="flex flex-col gap-1">
+          <h3 className="text-sm font-semibold">{t("menu.allergens")}</h3>
+          {item.allergens.length > 0 ? (
+            <div className="flex flex-wrap gap-1.5">
+              {item.allergens.map((a) => (
+                <Badge key={a} variant="outline" className="capitalize">
+                  {a}
+                </Badge>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              {t("menu.allergensNone")}
+            </p>
+          )}
+        </section>
+
         <div className="flex items-center justify-between">
           <span className="text-sm font-semibold">{t("menu.qty")}</span>
           <QtyStepper qty={qty} onChange={setQty} />

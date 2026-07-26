@@ -188,6 +188,10 @@ export function CheckoutSheet({
                 </div>
               </div>
 
+              <p className="text-xs text-muted-foreground">
+                {t("cart.allergenReminder")}
+              </p>
+
               <div className="flex items-center justify-between text-base font-semibold">
                 <span>{t("cart.total")}</span>
                 <span className="tabular-nums">

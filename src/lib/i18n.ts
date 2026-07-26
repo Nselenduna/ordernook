@@ -24,10 +24,14 @@ const dict = {
   "menu.increaseQty": "Increase quantity",
   "menu.addToOrder": "Add to order — {total}",
   "menu.added": "Added to your order",
+  "menu.allergens": "Allergens",
+  "menu.allergensNone": "No allergen info — please ask staff before collecting.",
 
   // Cart / checkout
   "cart.title": "Your order",
   "cart.empty": "Your order is empty.",
+  "cart.allergenReminder":
+    "Allergies? Check each item's allergens or ask staff before you collect.",
   "cart.remove": "Remove",
   "cart.nameLabel": "Your name",
   "cart.namePlaceholder": "e.g. Sam",
