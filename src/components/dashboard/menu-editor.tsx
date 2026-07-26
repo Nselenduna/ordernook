@@ -117,14 +117,16 @@ export function MenuEditor({
   }
 
   const swapCat = async (a: Category, b: Category) => {
-    await supabase.from("menu_categories").update({ sort_order: b.sort_order }).eq("id", a.id)
-    await supabase.from("menu_categories").update({ sort_order: a.sort_order }).eq("id", b.id)
+    const r1 = await supabase.from("menu_categories").update({ sort_order: b.sort_order }).eq("id", a.id)
+    const r2 = await supabase.from("menu_categories").update({ sort_order: a.sort_order }).eq("id", b.id)
+    if (r1.error || r2.error) fail()
     refresh()
   }
 
   const swapItem = async (a: EditorItem, b: EditorItem) => {
-    await supabase.from("menu_items").update({ sort_order: b.sort_order }).eq("id", a.id)
-    await supabase.from("menu_items").update({ sort_order: a.sort_order }).eq("id", b.id)
+    const r1 = await supabase.from("menu_items").update({ sort_order: b.sort_order }).eq("id", a.id)
+    const r2 = await supabase.from("menu_items").update({ sort_order: a.sort_order }).eq("id", b.id)
+    if (r1.error || r2.error) fail()
     refresh()
   }
 
