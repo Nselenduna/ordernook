@@ -41,7 +41,7 @@ export async function generateViewport({ params }: Props): Promise<Viewport> {
   const { slug } = await params;
   const shop = await getShopWithMenu(slug);
   const branding = shop ? parseBranding(shop.branding) : {};
-  return { themeColor: branding.accent ?? "#6F4E37" };
+  return { themeColor: branding.primary ?? branding.accent ?? "#6F4E37" };
 }
 
 /** Nested Supabase selects come back unordered — sort every level once here. */

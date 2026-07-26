@@ -19,7 +19,9 @@ export async function POST(request: Request) {
   const { data: staff } = await supabase
     .from("staff_users")
     .select("shop_id")
-    .single()
+    .eq("auth_user_id", user.id)
+    .limit(1)
+    .maybeSingle()
   const shopId = staff?.shop_id
   if (!shopId) return NextResponse.json({ error: "no_shop" }, { status: 403 })
 

@@ -35,7 +35,7 @@ export async function GET(
     start_url: `/${slug}?src=pwa`,
     scope: `/${slug}`,
     display: "standalone",
-    theme_color: b.accent ?? DEFAULT_BRANDING.primary,
+    theme_color: b.primary ?? b.accent ?? DEFAULT_BRANDING.primary,
     background_color: DEFAULT_BRANDING.background,
     icons,
   }
