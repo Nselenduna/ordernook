@@ -97,6 +97,24 @@ describe("RLS cross-tenant isolation", () => {
     expect(error).not.toBeNull() // RLS with-check rejects the insert
   })
 
+  it("A CANNOT inject an item into B's menu via B's category_id", async () => {
+    const { data: bCat } = await b
+      .from("menu_categories")
+      .select("id")
+      .eq("shop_id", bShopId)
+      .limit(1)
+      .single()
+    // shop_id is A's own (passes is_staff_of) but category belongs to B:
+    const { error } = await a.from("menu_items").insert({
+      shop_id: aShopId,
+      category_id: bCat!.id,
+      name: "xtenant",
+      price_minor: 1,
+      currency: "GBP",
+    })
+    expect(error).not.toBeNull() // category-ownership check must reject
+  })
+
   it("A CANNOT delete B's menu item", async () => {
     const { data: item } = await b
       .from("menu_items")
