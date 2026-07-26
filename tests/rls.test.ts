@@ -79,4 +79,37 @@ describe("RLS cross-tenant isolation", () => {
     const { data } = await a.from("menu_items").select("id").eq("shop_id", bShopId)
     expect((data ?? []).length).toBeGreaterThan(0)
   })
+
+  it("A CANNOT insert a menu item into B's shop", async () => {
+    const { data: cat } = await b
+      .from("menu_categories")
+      .select("id")
+      .eq("shop_id", bShopId)
+      .limit(1)
+      .single()
+    const { error } = await a.from("menu_items").insert({
+      shop_id: bShopId,
+      category_id: cat!.id,
+      name: "rls-hack",
+      price_minor: 1,
+      currency: "GBP",
+    })
+    expect(error).not.toBeNull() // RLS with-check rejects the insert
+  })
+
+  it("A CANNOT delete B's menu item", async () => {
+    const { data: item } = await b
+      .from("menu_items")
+      .select("id")
+      .eq("shop_id", bShopId)
+      .limit(1)
+      .single()
+    await a.from("menu_items").delete().eq("id", item!.id)
+    const { data: still } = await b
+      .from("menu_items")
+      .select("id")
+      .eq("id", item!.id)
+      .maybeSingle()
+    expect(still).not.toBeNull() // still there → delete was blocked by RLS
+  })
 })
