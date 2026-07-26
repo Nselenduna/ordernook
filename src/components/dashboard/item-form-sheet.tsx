@@ -72,10 +72,11 @@ export function ItemFormSheet({
   const save = async () => {
     const trimmed = name.trim()
     if (!trimmed) return toast.error(t("editor.nameRequired"))
-    const pounds = Number.parseFloat(price)
-    if (!Number.isFinite(pounds) || pounds < 0)
-      return toast.error(t("editor.priceInvalid"))
+    const raw = price.trim()
+    if (!/^\d+(\.\d{1,2})?$/.test(raw)) return toast.error(t("editor.priceInvalid"))
+    const pounds = Number.parseFloat(raw)
     const price_minor = Math.round(pounds * 100)
+    if (price_minor > 100_000_000) return toast.error(t("editor.priceInvalid")) // > £1,000,000 guard
 
     setSaving(true)
     const fields = {
