@@ -61,7 +61,7 @@ export function ShopProfile({
       .from("shops")
       .update({
         name: name.trim(),
-        branding: { ...current, tagline: tagline.trim(), accent: colour },
+        branding: { ...current, tagline: tagline.trim(), primary: colour, accent: colour },
       })
       .eq("id", shopId)
     setSaving(false)

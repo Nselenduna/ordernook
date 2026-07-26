@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { DashboardNav } from "@/components/dashboard/dashboard-nav";
 import { ShopProfile } from "@/components/dashboard/shop-profile";
 import { getStaffShop } from "@/lib/dashboard";
-import { parseBranding } from "@/lib/branding";
+import { DEFAULT_BRANDING, parseBranding } from "@/lib/branding";
 import { t } from "@/lib/i18n";
 
 export const metadata: Metadata = { title: t("nav.profile") };
@@ -18,7 +18,7 @@ export default async function ProfilePage() {
         shopId={shop.id}
         initialName={shop.name}
         initialTagline={branding.tagline ?? ""}
-        initialColour={branding.accent ?? "#6F4E37"}
+        initialColour={branding.primary ?? DEFAULT_BRANDING.primary}
         initialLogoUrl={branding.logo_url ?? null}
       />
     </div>
