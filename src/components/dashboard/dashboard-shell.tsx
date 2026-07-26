@@ -1,12 +1,12 @@
 "use client"
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
-import { useRouter } from "next/navigation"
 import { BellRingIcon, Volume2Icon, VolumeXIcon } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { DashboardNav } from "@/components/dashboard/dashboard-nav"
 import { OrderCard } from "@/components/dashboard/order-card"
 import { RejectDialog } from "@/components/dashboard/reject-dialog"
 import { useChime } from "@/components/dashboard/use-chime"
@@ -45,7 +45,6 @@ function queueSort(a: DashboardOrder, b: DashboardOrder): number {
 }
 
 export function DashboardShell({ shop }: { shop: Tables<"shops"> }) {
-  const router = useRouter()
   const supabase = useMemo(() => createClient(), [])
   const { play, unlocked, unlock } = useChime()
 
@@ -207,12 +206,6 @@ export function DashboardShell({ shop }: { shop: Tables<"shops"> }) {
     }
   }
 
-  const signOut = async () => {
-    await supabase.auth.signOut()
-    router.push("/dashboard/login")
-    router.refresh()
-  }
-
   const sorted = [...orders].sort(queueSort)
   const visible =
     tab === "all" ? sorted : sorted.filter((order) => tabOf(order.status) === tab)
@@ -236,42 +229,29 @@ export function DashboardShell({ shop }: { shop: Tables<"shops"> }) {
 
   return (
     <div className="theme-travo flex min-h-dvh flex-1 flex-col bg-background text-foreground">
-      <header className="sticky top-0 z-30 border-b border-border bg-background/90 backdrop-blur-md">
-        <div className="mx-auto flex h-16 w-full max-w-3xl items-center justify-between gap-2 px-4">
-          <div className="flex items-center gap-2.5">
-            <h1 className="font-heading text-lg font-bold">{shop.name}</h1>
-            <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
-              <span
-                className={cn(
-                  "size-2 rounded-full",
-                  live ? "animate-pulse bg-(--status-ready)" : "bg-border"
-                )}
-              />
-              {live ? t("dash.live") : t("dash.connecting")}
-            </span>
-          </div>
-          <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              className="h-11 rounded-full px-3"
-              onClick={toggleMute}
-              aria-pressed={muted}
-            >
-              {muted ? <VolumeXIcon /> : <Volume2Icon />}
-              <span className="hidden sm:inline">
-                {muted ? t("dash.soundOff") : t("dash.soundOn")}
-              </span>
-            </Button>
-            <Button
-              variant="ghost"
-              className="h-11 rounded-full px-3 text-muted-foreground"
-              onClick={signOut}
-            >
-              {t("dash.signOut")}
-            </Button>
-          </div>
-        </div>
-      </header>
+      <DashboardNav shop={shop} active="orders" />
+      <div className="mx-auto flex w-full max-w-3xl items-center justify-end gap-1 px-4 pt-2">
+        <span className="mr-auto flex items-center gap-1.5 text-xs text-muted-foreground">
+          <span
+            className={cn(
+              "size-2 rounded-full",
+              live ? "animate-pulse bg-(--status-ready)" : "bg-border"
+            )}
+          />
+          {live ? t("dash.live") : t("dash.connecting")}
+        </span>
+        <Button
+          variant="ghost"
+          className="h-11 rounded-full px-3"
+          onClick={toggleMute}
+          aria-pressed={muted}
+        >
+          {muted ? <VolumeXIcon /> : <Volume2Icon />}
+          <span className="hidden sm:inline">
+            {muted ? t("dash.soundOff") : t("dash.soundOn")}
+          </span>
+        </Button>
+      </div>
 
       <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-4 px-4 py-4">
         {!unlocked && !muted && (

@@ -133,6 +133,12 @@ const dict = {
   "dash.status.pending_payment": "Awaiting payment",
   "dash.status.refunded": "Refunded",
 
+  // Dashboard nav
+  "nav.orders": "Orders",
+  "nav.menu": "Menu",
+  "nav.settings": "Settings",
+  "nav.qr": "QR code",
+
   // Web push payload (rendered server-side in /api/notify-ready)
   "push.readyTitle": "{shop} — order #{number}",
   "push.readyBody": "Your order is ready to collect!",
