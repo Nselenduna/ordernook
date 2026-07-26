@@ -9,7 +9,7 @@ Phase 0 build underway. Infra done, app code in progress.
 - Supabase project `order-ahead` (`iryavyogljedwgllaoit`, eu-west-2). NOTE: **wez_me_van was paused** to free the free-plan slot — restore it from the Supabase dashboard when needed.
 - Schema + RLS + `create_order` / `get_order_by_token` / `attach_push_subscription` + audit triggers applied and smoke-tested (Large Oat Latte ×2 = 880 minor units ✓).
 - Test shop seeded: **The Corner Grind** (`corner-grind`), 13 items, Size/Milk/Extras options.
-- Dashboard login (dev seed): `owner@cornergrind.test` / `CornerGrind-Demo1!`
+- Dashboard login (dev seed): `owner@cornergrind.test` — password rotated 26 Jul 2026; current value lives in local `.env.test` (gitignored), not committed. (Old committed value is dead.)
 - Next.js scaffold + Tailwind + shadcn/ui, deps installed; VAPID keys generated (.env.local).
 - Design locked: Travo Purple dashboard, Latte Glass customer default (see DESIGN.md).
 

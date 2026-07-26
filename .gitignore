@@ -46,3 +46,6 @@ supabase/.branches
 
 .vercel
 .env*
+
+# SDD scratch (ledger, briefs, review packages)
+.superpowers/
