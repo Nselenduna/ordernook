@@ -24,8 +24,9 @@ Phase 0 build underway. Infra done, app code in progress.
 - **Schema exported to git**: `supabase/migrations/` (5 baseline migrations); local↔remote history in sync. Committed (3c818a7).
 - **Deployed to Vercel**: `lloydmgutshini-projects/order-ahead`. Menu renders from Supabase, 0 console errors. Env vars set for prod + preview.
 - **Name = OrderNook** (rebrand deployed to prod); GitHub repo `Nselenduna/ordernook` (master pushed).
-- **Custom domain LIVE**: https://ordernook.uk serves the app over HTTPS (valid cert); `www.ordernook.uk` 308-redirects to apex. Registered at Namecheap (A `@`→64.29.17.1, CNAME `www`→cname.vercel-dns.com). Vercel project not yet renamed order-ahead→ordernook.
-- **Left off at:** iPhone PWA install + push test on real device (the last unverified Phase 0 assumption; now testable at https://ordernook.uk/corner-grind).
+- **Custom domain LIVE**: https://ordernook.uk serves the app over HTTPS (valid cert); `www.ordernook.uk` 308-redirects to apex. Registered at Namecheap (A `@`→64.29.17.1, CNAME `www`→cname.vercel-dns.com). Vercel project **renamed** `order-ahead`→`ordernook` (id prj_Lh9UiNaafUdE5eipbkJ5vPhggnD6 unchanged).
+- **iPhone test FULLY PASSED (26 Jul):** installed as PWA from home screen, full order flow works, notification permission granted, and **"order ready" web push DELIVERED on iOS** when the order was advanced to Ready on the dashboard (logged in as dev seed `owner@cornergrind.test`). The riskiest spec assumption (iOS push to installed PWA) is proven on real hardware.
+- **Phase 0 COMPLETE — zero open risks.** Next: Phase 1 (self-serve shop registration, menu editor, per-shop branding + dynamic manifest, QR PDF, per-shop routing) = the sellable Basic tier.
 
 ## Gotchas
 - Supabase now Pro tier under Zizwe org — 2-active-project free limit no longer applies to order-ahead.
