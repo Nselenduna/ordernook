@@ -1,0 +1,8 @@
+# Supabase project config for the order-ahead project.
+# Links this repo to the hosted project so `supabase db push` / `db pull` work.
+# Ref: iryavyogljedwgllaoit (order-ahead, eu-west-2, Zizwe org).
+project_id = "iryavyogljedwgllaoit"
+
+[db]
+# Match the hosted Postgres major version (17) for local/shadow diffs.
+major_version = 17
