@@ -1,11 +1,11 @@
--- OrderNook pilot shop seed. Fill in the 4 \set values, paste into the
--- Supabase SQL editor (project iryavyogljedwgllaoit), and run.
--- Creates: shop + owner login + a minimal starter menu. Edit the menu inserts
--- to match the real shop. UK country row is assumed to exist already.
-\set shop_slug 'joes-cafe'
-\set shop_name 'Joe''s Cafe'
-\set owner_email 'owner@joescafe.test'
-\set owner_password 'ChangeMe-Now1!'
+-- OrderNook pilot shop seed. Plain SQL for the Supabase Dashboard SQL editor.
+-- Before running, find-and-replace these four placeholder values throughout the script:
+--   1. slug: 'joes-cafe'
+--   2. name: 'Joe''s Cafe'
+--   3. owner email (2 places): 'owner@joescafe.test'
+--   4. owner password: 'ChangeMe-Now1!'
+-- You can also edit the menu inserts to match the real shop.
+-- UK country row is assumed to exist already.
 
 do $$
 declare
@@ -14,7 +14,7 @@ declare
   v_user_id uuid := gen_random_uuid();
 begin
   insert into public.shops (slug, name, country_code, branding, prep_minutes, hours)
-  values (:'shop_slug', :'shop_name', 'GB',
+  values ('joes-cafe', 'Joe''s Cafe', 'GB',
           jsonb_build_object('tagline', 'Skip the queue.'),
           10, '{}'::jsonb)
   returning id into v_shop_id;
@@ -36,14 +36,14 @@ begin
                           created_at, updated_at, confirmation_token, recovery_token,
                           email_change, email_change_token_new)
   values ('00000000-0000-0000-0000-000000000000', v_user_id, 'authenticated', 'authenticated',
-          :'owner_email', crypt(:'owner_password', gen_salt('bf')),
+          'owner@joescafe.test', crypt('ChangeMe-Now1!', gen_salt('bf')),
           now(), '{"provider":"email","providers":["email"]}'::jsonb, '{}'::jsonb,
           now(), now(), '', '', '', '');
 
   insert into auth.identities (id, user_id, provider_id, identity_data, provider,
                                last_sign_in_at, created_at, updated_at)
   values (gen_random_uuid(), v_user_id, v_user_id::text,
-          jsonb_build_object('sub', v_user_id::text, 'email', :'owner_email', 'email_verified', true),
+          jsonb_build_object('sub', v_user_id::text, 'email', 'owner@joescafe.test', 'email_verified', true),
           'email', now(), now(), now());
 
   insert into public.staff_users (shop_id, auth_user_id, role)
