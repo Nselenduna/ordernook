@@ -22,8 +22,10 @@ Phase 0 build underway. Infra done, app code in progress.
 ## Update — 26 Jul 2026
 - Supabase project moved to **Zizwe org, Pro tier** (ref iryavyogljedwgllaoit unchanged). Free-plan slot juggling no longer applies.
 - **Schema exported to git**: `supabase/migrations/` (5 baseline migrations); local↔remote history in sync. Committed (3c818a7).
-- **Deployed to Vercel**: `lloydmgutshini-projects/order-ahead`. Live at https://order-ahead-omega.vercel.app/corner-grind. Menu renders from Supabase, 0 console errors. Env vars set for prod + preview.
-- **Left off at:** iPhone PWA install + push test on real device (the last unverified Phase 0 assumption; now unblocked by HTTPS).
+- **Deployed to Vercel**: `lloydmgutshini-projects/order-ahead`. Menu renders from Supabase, 0 console errors. Env vars set for prod + preview.
+- **Name = OrderNook** (rebrand deployed to prod); GitHub repo `Nselenduna/ordernook` (master pushed).
+- **Custom domain LIVE**: https://ordernook.uk serves the app over HTTPS (valid cert); `www.ordernook.uk` 308-redirects to apex. Registered at Namecheap (A `@`→64.29.17.1, CNAME `www`→cname.vercel-dns.com). Vercel project not yet renamed order-ahead→ordernook.
+- **Left off at:** iPhone PWA install + push test on real device (the last unverified Phase 0 assumption; now testable at https://ordernook.uk/corner-grind).
 
 ## Gotchas
 - Supabase now Pro tier under Zizwe org — 2-active-project free limit no longer applies to order-ahead.
