@@ -1,4 +1,4 @@
-# DESIGN.md — Order-Ahead
+# DESIGN.md — OrderNook
 
 Template decision (11 Jul 2026): **Mix — Travo Purple (shop dashboard) + Latte Glass (customer PWA default theme)**.
 Customer PWA colours are overridden per shop via `shops.branding` jsonb; Latte Glass is the fallback/default.

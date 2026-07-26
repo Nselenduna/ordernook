@@ -1,36 +1,42 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# OrderNook
 
-## Getting Started
+**A cosy corner for every order.**
 
-First, run the development server:
+White-label order-ahead PWA for small neighbourhood food & drink shops (coffee, sandwiches, bakeries). A shop registers, builds its menu, and gets a QR code; customers scan once, install the shop's *own* branded PWA, then order ahead and skip the queue. Flat subscription, **zero per-order commission** — customer money goes directly to the shop via Stripe Connect.
+
+By Zizwe IT Limited — *Low Cost. High Impact.*
+
+## Stack
+
+- **Next.js 16** (App Router) + TypeScript
+- **Supabase** — Postgres, Auth, RLS, Realtime (project `iryavyogljedwgllaoit`)
+- **Tailwind + shadcn/ui**, Zustand (cart)
+- **web-push** (VAPID) for "order ready" notifications
+- Hosting: **Vercel**
+
+## Getting started
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then open http://localhost:3000/corner-grind (the seeded Phase 0 test shop, "The Corner Grind").
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Requires `.env.local` (gitignored) with Supabase + VAPID keys — see `.env.example`.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Project layout
 
-## Learn More
+- `src/app/[slug]` — customer menu / ordering PWA (per shop)
+- `src/app/dashboard` — shop live order queue + status flow
+- `src/app/order` — tokened customer order-status page
+- `src/lib`, `src/store` — Supabase clients, i18n, cart
+- `supabase/migrations` — full schema, RLS, and RPCs (source of truth)
 
-To learn more about Next.js, take a look at the following resources:
+## Status
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Phase 0 complete and verified (browser + Pixel 6). Deployed to Vercel. Next: real-iPhone PWA install + push test, then Phase 1 (self-serve shop registration). See `roadmap.md`, `state.md`, and `decisions/log.md`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Docs
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+`project.md` (North Star) · `requirements.md` · `../SPEC.md` (full product + technical spec).

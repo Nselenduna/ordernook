@@ -5,6 +5,8 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: __dirname,
   },
+  // Lets the phone (LAN IP) load HMR/dev assets instead of being blocked as cross-origin.
+  allowedDevOrigins: ["192.168.0.10"],
 };
 
 export default nextConfig;

@@ -1,4 +1,4 @@
-# project.md — Order-Ahead (North Star)
+# project.md — OrderNook (North Star)
 
 **What:** White-label order-ahead PWA for small neighbourhood food & drink shops (coffee, sandwiches, bakeries). Shop registers → builds menu → gets a QR code → customers scan once, install the shop's branded PWA, order ahead, skip the queue.
 

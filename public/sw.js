@@ -1,4 +1,4 @@
-/* Order-Ahead service worker: web push + minimal, safe caching. */
+/* OrderNook service worker: web push + minimal, safe caching. */
 
 const CACHE_NAME = "oa-static-v1";
 

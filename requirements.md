@@ -1,4 +1,4 @@
-# requirements.md — Order-Ahead Phase 0
+# requirements.md — OrderNook Phase 0
 
 Full spec: `../HANDOFF.md` §8 (schema), §11 (phases), Part 5 (task list). This file = Phase 0 acceptance criteria only.
 

@@ -5,7 +5,7 @@
  */
 const dict = {
   // App-wide
-  "app.name": "Order-Ahead",
+  "app.name": "OrderNook",
   "app.description": "Order ahead and skip the queue.",
 
   // Customer menu page

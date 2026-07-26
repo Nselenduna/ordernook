@@ -1,4 +1,4 @@
-# state.md — Order-Ahead
+# state.md — OrderNook
 
 **Updated:** 11 Jul 2026 (session in progress)
 
@@ -19,7 +19,14 @@ Phase 0 build underway. Infra done, app code in progress.
 - Inline review done (1 display bug fixed); DB advisor hardening applied.
 - See handoff.md for run instructions and next actions.
 
+## Update — 26 Jul 2026
+- Supabase project moved to **Zizwe org, Pro tier** (ref iryavyogljedwgllaoit unchanged). Free-plan slot juggling no longer applies.
+- **Schema exported to git**: `supabase/migrations/` (5 baseline migrations); local↔remote history in sync. Committed (3c818a7).
+- **Deployed to Vercel**: `lloydmgutshini-projects/order-ahead`. Live at https://order-ahead-omega.vercel.app/corner-grind. Menu renders from Supabase, 0 console errors. Env vars set for prod + preview.
+- **Left off at:** iPhone PWA install + push test on real device (the last unverified Phase 0 assumption; now unblocked by HTTPS).
+
 ## Gotchas
-- Supabase free plan = 2 active projects; slots used by revalidator_rebuild + order-ahead.
+- Supabase now Pro tier under Zizwe org — 2-active-project free limit no longer applies to order-ahead.
 - iOS push only works for installed home-screen PWAs (iOS 16.4+) — test on real iPhone.
 - Sentry DSN not yet set (.env.local placeholder).
+- Vercel deploy is currently CLI-based (not git-connected). Connect the Git repo in Vercel for auto-deploy on push, if wanted.

@@ -43,3 +43,6 @@ next-env.d.ts
 # supabase (keep migrations + config.toml; ignore local CLI state)
 supabase/.temp
 supabase/.branches
+
+.vercel
+.env*

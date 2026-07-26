@@ -1,4 +1,4 @@
-# handoff.md — Order-Ahead (session end: 11 Jul 2026)
+# handoff.md — OrderNook (session end: 11 Jul 2026)
 
 ## TL;DR
 **Phase 0 is built, committed, and verified end-to-end in a live browser.** Menu → customise → cart → guest checkout → order lands in the dashboard in realtime → status flow → customer status page updates. Production build passes.
