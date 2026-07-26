@@ -189,6 +189,35 @@ const dict = {
   // Web push payload (rendered server-side in /api/notify-ready)
   "push.readyTitle": "{shop} — order #{number}",
   "push.readyBody": "Your order is ready to collect!",
+
+  // Menu editor
+  "editor.addCategory": "Add category",
+  "editor.newCategory": "New category name",
+  "editor.noCategories": "No categories yet. Add one to start your menu.",
+  "editor.categoryName": "Category name",
+  "editor.categoryNotEmpty": "Empty the category before deleting it.",
+  "editor.deleteCategory": "Delete category",
+  "editor.addItem": "Add item",
+  "editor.editItem": "Edit item",
+  "editor.deleteItem": "Delete item",
+  "editor.itemFormHint": "Set the name, price, category and allergens.",
+  "editor.name": "Name",
+  "editor.description": "Description",
+  "editor.priceLabel": "Price (£)",
+  "editor.category": "Category",
+  "editor.allergens": "Allergens",
+  "editor.save": "Save",
+  "editor.saving": "Saving…",
+  "editor.saved": "Saved.",
+  "editor.saveFailed": "Couldn't save — try again.",
+  "editor.nameRequired": "Please enter a name.",
+  "editor.priceInvalid": "Enter a valid price (e.g. 3.50).",
+  "editor.moveUp": "Move up",
+  "editor.moveDown": "Move down",
+  "editor.deleteItemTitle": "Delete this item?",
+  "editor.deleteItemBody": "\"{name}\" will be removed from your menu. Past orders keep their record.",
+  "editor.cancel": "Cancel",
+  "editor.confirmDelete": "Delete",
 } as const
 
 export type I18nKey = keyof typeof dict
