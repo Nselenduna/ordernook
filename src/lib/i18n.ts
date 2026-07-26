@@ -156,6 +156,17 @@ const dict = {
   "nav.settings": "Settings",
   "nav.qr": "QR code",
 
+  // Dashboard QR code panel + printable poster
+  "qr.title": "Your QR code",
+  "qr.subtitle": "Print this and put it on the counter. Customers scan to order.",
+  "qr.download": "Download QR (PNG)",
+  "qr.copyLink": "Copy link",
+  "qr.copied": "Link copied.",
+  "qr.openPoster": "Open printable poster",
+  "qr.posterHeadline": "Skip the queue",
+  "qr.posterSub": "Scan to order ahead & collect",
+  "qr.print": "Print poster",
+
   // Web push payload (rendered server-side in /api/notify-ready)
   "push.readyTitle": "{shop} — order #{number}",
   "push.readyBody": "Your order is ready to collect!",
