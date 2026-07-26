@@ -133,6 +133,12 @@ const dict = {
   "dash.status.pending_payment": "Awaiting payment",
   "dash.status.refunded": "Refunded",
 
+  // Dashboard menu (availability toggle)
+  "menu.available": "Available",
+  "menu.markSoldOut": "Sold out",
+  "menu.updateFailed": "Couldn't update — try again.",
+  "menu.emptyMenu": "No menu items yet.",
+
   // Dashboard nav
   "nav.orders": "Orders",
   "nav.menu": "Menu",
