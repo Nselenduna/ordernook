@@ -26,7 +26,8 @@ export function ShopSettings({
   const accepting = !paused
 
   const toggleAccepting = async () => {
-    const nextPaused = accepting // turning "accepting" off => paused true
+    // nextPaused = accepting, because `accepting` is already the toggled value of `paused`
+    const nextPaused = accepting
     setPaused(nextPaused) // optimistic
     const { error } = await supabase
       .from("shops")
@@ -76,7 +77,7 @@ export function ShopSettings({
               : "bg-destructive/10 text-destructive"
           )}
         >
-          {accepting ? t("settings.acceptingOrders") : t("settings.acceptingOff")}
+          {accepting ? t("settings.acceptingOrders") : t("settings.acceptingOffLabel")}
         </button>
       </section>
 
@@ -97,7 +98,7 @@ export function ShopSettings({
             disabled={savingPrep}
             onClick={savePrep}
           >
-            {t("settings.saved").replace(".", "")}
+            {t("settings.saveButton")}
           </Button>
         </div>
         <p className="text-xs text-muted-foreground">{t("settings.prepHint")}</p>

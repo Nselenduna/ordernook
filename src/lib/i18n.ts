@@ -143,9 +143,11 @@ const dict = {
   "settings.acceptingOrders": "Accepting orders",
   "settings.acceptingOn": "Customers can order now.",
   "settings.acceptingOff": "Ordering is paused — the shop page shows a paused message.",
+  "settings.acceptingOffLabel": "Paused",
   "settings.prepTime": "Prep time (minutes)",
   "settings.prepHint": "Shown to customers as the estimated ready time.",
   "settings.saved": "Saved.",
+  "settings.saveButton": "Save",
   "settings.saveFailed": "Couldn't save — try again.",
 
   // Dashboard nav
