@@ -105,7 +105,15 @@ export function MenuPage({
 
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col pb-28">
-      <header className="px-4 pt-10 pb-4 text-center">
+      <header className="flex flex-col items-center px-4 pt-10 pb-4 text-center">
+        {branding.logo_url && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={branding.logo_url}
+            alt=""
+            className="mb-3 size-20 rounded-2xl object-cover shadow-[0_8px_30px_rgba(111,78,55,.15)]"
+          />
+        )}
         <h1 className="font-heading text-4xl font-semibold">{shop.name}</h1>
         {branding.tagline && (
           <p className="mt-2 text-sm text-muted-foreground">
