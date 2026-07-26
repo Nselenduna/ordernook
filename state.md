@@ -26,7 +26,9 @@ Phase 0 build underway. Infra done, app code in progress.
 - **Name = OrderNook** (rebrand deployed to prod); GitHub repo `Nselenduna/ordernook` (master pushed).
 - **Custom domain LIVE**: https://ordernook.uk serves the app over HTTPS (valid cert); `www.ordernook.uk` 308-redirects to apex. Registered at Namecheap (A `@`→64.29.17.1, CNAME `www`→cname.vercel-dns.com). Vercel project **renamed** `order-ahead`→`ordernook` (id prj_Lh9UiNaafUdE5eipbkJ5vPhggnD6 unchanged).
 - **iPhone test FULLY PASSED (26 Jul):** installed as PWA from home screen, full order flow works, notification permission granted, and **"order ready" web push DELIVERED on iOS** when the order was advanced to Ready on the dashboard (logged in as dev seed `owner@cornergrind.test`). The riskiest spec assumption (iOS push to installed PWA) is proven on real hardware.
-- **Phase 0 COMPLETE — zero open risks.** Next: Phase 1 (self-serve shop registration, menu editor, per-shop branding + dynamic manifest, QR PDF, per-shop routing) = the sellable Basic tier.
+- **Phase 0 COMPLETE — zero open risks.**
+- **Phase 1 Slice 1 (Go-Live Kit) SHIPPED (26 Jul 2026):** dashboard nav + Menu (sold-out toggle) + Settings (accepting-orders + prep) + QR panel/poster; `menu_items.allergens` + customer display; pilot seed template (`scripts/seed-shop.sql`); RLS cross-tenant isolation test (7/7). Built subagent-driven (7 tasks, all reviewed). Merged to master (358d38e) + **deployed to production (ordernook.uk)**. RLS verified sound. Dev-seed password rotated (new value in local `.env.test`). Second test shop seeded: `pilot-test`.
+- **Next: Phase 1 Slice 2** — full menu editor (CRUD items/categories/options, photos, allergen editing). See `roadmap.md` / `phase1-go-live-kit-plan.md` §8. Master merged locally + deployed; NOT yet pushed to GitHub.
 
 ## Gotchas
 - Supabase now Pro tier under Zizwe org — 2-active-project free limit no longer applies to order-ahead.
