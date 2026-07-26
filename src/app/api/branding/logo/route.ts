@@ -36,23 +36,26 @@ export async function POST(request: Request) {
   // Flatten alpha onto white (prevents iOS black-box on transparent PNGs).
   const base = sharp(input).flatten({ background: "#ffffff" })
 
-  for (const size of SIZES) {
-    const png = await base
-      .clone()
-      .resize(size, size, { fit: "cover", position: "centre" })
-      .png()
-      .toBuffer()
-    const { error } = await supabase.storage
-      .from("shop-logos")
-      .upload(`${shopId}/icon-${size}.png`, png, {
-        contentType: "image/png",
-        upsert: true,
-      })
-    if (error)
-      return NextResponse.json(
-        { error: "upload_failed", detail: error.message },
-        { status: 500 }
-      )
+  try {
+    for (const size of SIZES) {
+      const png = await base
+        .clone()
+        .resize(size, size, { fit: "cover", position: "centre" })
+        .png()
+        .toBuffer()
+      const { error } = await supabase.storage
+        .from("shop-logos")
+        .upload(`${shopId}/icon-${size}.png`, png, {
+          contentType: "image/png",
+          upsert: true,
+        })
+      if (error)
+        return NextResponse.json({ error: "upload_failed" }, { status: 500 })
+    }
+  } catch {
+    // sharp couldn't decode the file (corrupt/unsupported image that slipped
+    // past the MIME-type check, which only trusts the browser's Content-Type).
+    return NextResponse.json({ error: "invalid_image" }, { status: 400 })
   }
 
   const {
@@ -60,11 +63,13 @@ export async function POST(request: Request) {
   } = supabase.storage.from("shop-logos").getPublicUrl(`${shopId}/icon-512.png`)
 
   // Merge logo_url into existing branding jsonb (don't clobber tagline/accent).
-  const { data: shop } = await supabase
+  const { data: shop, error: readErr } = await supabase
     .from("shops")
     .select("branding")
     .eq("id", shopId)
     .single()
+  if (readErr)
+    return NextResponse.json({ error: "save_failed" }, { status: 500 })
   const nextBranding = { ...parseBranding(shop?.branding), logo_url: publicUrl }
   const { error: upErr } = await supabase
     .from("shops")
