@@ -7,6 +7,8 @@ const nextConfig: NextConfig = {
   },
   // Lets the phone (LAN IP) load HMR/dev assets instead of being blocked as cross-origin.
   allowedDevOrigins: ["192.168.0.10"],
+  // sharp ships native bindings — keep it out of the server bundle, load at runtime.
+  serverExternalPackages: ["sharp"],
 };
 
 export default nextConfig;
