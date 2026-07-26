@@ -1,5 +1,5 @@
 import { cache } from "react";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 import { MenuPage } from "@/components/shop/menu-page";
 import { brandingVars, parseBranding } from "@/lib/branding";
@@ -30,7 +30,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: shop.name,
     description: branding.tagline ?? t("app.description"),
+    manifest: `/${slug}/manifest.webmanifest`,
+    icons: branding.logo_url
+      ? { apple: branding.logo_url.replace("icon-512", "icon-180") }
+      : undefined,
   };
+}
+
+export async function generateViewport({ params }: Props): Promise<Viewport> {
+  const { slug } = await params;
+  const shop = await getShopWithMenu(slug);
+  const branding = shop ? parseBranding(shop.branding) : {};
+  return { themeColor: branding.accent ?? "#6F4E37" };
 }
 
 /** Nested Supabase selects come back unordered — sort every level once here. */
