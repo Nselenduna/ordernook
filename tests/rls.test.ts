@@ -17,6 +17,8 @@ async function signedIn(email: string, password: string): Promise<SupabaseClient
 // Derive each account's OWN shop via staff_users (RLS scopes it to self).
 // NOT via an unfiltered shops query — shops/menu_items are public-read by design
 // (anonymous QR menu browsing), so that would return an arbitrary shop.
+// Assumes exactly one staff_users row per account (true today); would need
+// .limit(1) handling if multi-shop staff is added later.
 async function ownShopId(client: SupabaseClient): Promise<string> {
   const { data, error } = await client.from("staff_users").select("shop_id").single()
   if (error) throw error
@@ -57,8 +59,13 @@ describe("RLS cross-tenant isolation", () => {
     expect(afterItem!.is_available).toEqual(original)
   })
 
-  it("A CANNOT read B's orders (customer PII isolation)", async () => {
-    const { data } = await a.from("orders").select("id").eq("shop_id", bShopId)
+  it("A can read its own orders (precondition — corner-grind has orders)", async () => {
+    const { data } = await a.from("orders").select("id").eq("shop_id", aShopId)
+    expect((data ?? []).length).toBeGreaterThan(0)
+  })
+
+  it("B CANNOT read A's orders (customer PII isolation)", async () => {
+    const { data } = await b.from("orders").select("id").eq("shop_id", aShopId)
     expect(data ?? []).toHaveLength(0)
   })
 
