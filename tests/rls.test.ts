@@ -130,4 +130,71 @@ describe("RLS cross-tenant isolation", () => {
       .maybeSingle()
     expect(still).not.toBeNull() // still there → delete was blocked by RLS
   })
+
+  it("A CANNOT create an option group on B's item", async () => {
+    const { data: item } = await b
+      .from("menu_items")
+      .select("id")
+      .eq("shop_id", bShopId)
+      .limit(1)
+      .single()
+    const { error } = await a.from("option_groups").insert({
+      item_id: item!.id,
+      name: "rls-hack",
+      type: "single",
+      required: false,
+      sort_order: 999,
+    })
+    expect(error).not.toBeNull() // RLS with-check rejects via item→shop join
+  })
+
+  it("B CANNOT add an option to A's group", async () => {
+    const { data: group } = await a
+      .from("option_groups")
+      .select("id, menu_items!inner(shop_id)")
+      .eq("menu_items.shop_id", aShopId)
+      .limit(1)
+      .single()
+    const { error } = await b.from("options").insert({
+      group_id: (group as { id: string }).id,
+      name: "rls-hack",
+      price_delta_minor: 1,
+      sort_order: 999,
+    })
+    expect(error).not.toBeNull() // RLS with-check rejects via group→item→shop join
+  })
+
+  it("B CANNOT delete A's option group", async () => {
+    const { data: group } = await a
+      .from("option_groups")
+      .select("id, menu_items!inner(shop_id)")
+      .eq("menu_items.shop_id", aShopId)
+      .limit(1)
+      .single()
+    const gid = (group as { id: string }).id
+    await b.from("option_groups").delete().eq("id", gid)
+    const { data: still } = await a
+      .from("option_groups")
+      .select("id")
+      .eq("id", gid)
+      .maybeSingle()
+    expect(still).not.toBeNull() // still there → delete was blocked
+  })
+
+  it("A CAN add then remove an option on its own group (policy isn't deny-all)", async () => {
+    const { data: group } = await a
+      .from("option_groups")
+      .select("id, menu_items!inner(shop_id)")
+      .eq("menu_items.shop_id", aShopId)
+      .limit(1)
+      .single()
+    const gid = (group as { id: string }).id
+    const { data: inserted, error } = await a
+      .from("options")
+      .insert({ group_id: gid, name: "rls-selftest", price_delta_minor: 0, sort_order: 9999 })
+      .select("id")
+      .single()
+    expect(error).toBeNull()
+    if (inserted) await a.from("options").delete().eq("id", (inserted as { id: string }).id) // cleanup
+  })
 })
