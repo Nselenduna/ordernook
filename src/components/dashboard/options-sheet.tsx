@@ -209,6 +209,12 @@ export function OptionsSheet({
                   </button>
                 </div>
 
+                {group.required && options.length === 0 && (
+                  <p className="text-xs font-medium text-destructive">
+                    {t("editor.requiredNoOptions")}
+                  </p>
+                )}
+
                 <ul className="flex flex-col gap-1.5">
                   {options.map((o, oi) => (
                     <li key={o.id} className="flex items-center gap-1 rounded-xl border border-border bg-background p-2">

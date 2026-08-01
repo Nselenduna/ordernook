@@ -237,6 +237,7 @@ const dict = {
   "editor.optionName": "Option name",
   "editor.optionDelta": "Price change (£)",
   "editor.deleteOption": "Delete option",
+  "editor.requiredNoOptions": "Add at least one option, or customers can't order this item.",
 } as const
 
 export type I18nKey = keyof typeof dict
