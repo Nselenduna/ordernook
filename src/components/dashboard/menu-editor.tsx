@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import type { ReactNode } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import {
@@ -9,6 +8,7 @@ import {
   ChevronUpIcon,
   PencilIcon,
   PlusIcon,
+  SlidersHorizontalIcon,
   Trash2Icon,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -21,7 +21,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import { IconBtn } from "@/components/dashboard/icon-btn"
 import { ItemFormSheet } from "@/components/dashboard/item-form-sheet"
+import { OptionsSheet } from "@/components/dashboard/options-sheet"
 import type {
   EditorItem,
   EditorMenuItem,
@@ -36,30 +38,6 @@ type Category = {
   name: string
   sort_order: number
   menu_items: EditorMenuItem[]
-}
-
-function IconBtn({
-  label,
-  disabled,
-  onClick,
-  children,
-}: {
-  label: string
-  disabled?: boolean
-  onClick: () => void
-  children: ReactNode
-}) {
-  return (
-    <button
-      type="button"
-      aria-label={label}
-      disabled={disabled}
-      onClick={onClick}
-      className="flex size-8 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-secondary disabled:opacity-30"
-    >
-      {children}
-    </button>
-  )
 }
 
 export function MenuEditor({
@@ -78,8 +56,14 @@ export function MenuEditor({
   const [editItem, setEditItem] = useState<EditorItem | null>(null)
   const [formCategoryId, setFormCategoryId] = useState("")
   const [deleteTarget, setDeleteTarget] = useState<EditorItem | null>(null)
+  const [optionsItemId, setOptionsItemId] = useState<string | null>(null)
 
   const cats = [...categories].sort((a, b) => a.sort_order - b.sort_order)
+  // Read the open options sheet's item from props by id (not a stored snapshot),
+  // so router.refresh() after a mutation re-renders it with fresh data.
+  const optionsItem = optionsItemId
+    ? cats.flatMap((c) => c.menu_items).find((i) => i.id === optionsItemId) ?? null
+    : null
   const catList = cats.map((c) => ({ id: c.id, name: c.name }))
   const refresh = () => router.refresh()
   const fail = () => toast.error(t("editor.saveFailed"))
@@ -243,6 +227,9 @@ export function MenuEditor({
                   >
                     {it.is_available ? t("menu.available") : t("menu.markSoldOut")}
                   </button>
+                  <IconBtn label={t("editor.options")} onClick={() => setOptionsItemId(it.id)}>
+                    <SlidersHorizontalIcon className="size-4" />
+                  </IconBtn>
                   <IconBtn label={t("editor.editItem")} onClick={() => openEdit(it)}>
                     <PencilIcon className="size-4" />
                   </IconBtn>
@@ -276,6 +263,16 @@ export function MenuEditor({
           currency={currency}
           defaultCategoryId={formCategoryId || catList[0].id}
           nextSortOrder={nextSortOrder}
+        />
+      )}
+
+      {optionsItem && (
+        <OptionsSheet
+          key={optionsItem.id}
+          item={optionsItem}
+          currency={currency}
+          open={optionsItem !== null}
+          onOpenChange={(o) => !o && setOptionsItemId(null)}
         />
       )}
 
