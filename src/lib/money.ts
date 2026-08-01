@@ -16,3 +16,17 @@ export function formatMinor(
   const digits = formatter.resolvedOptions().maximumFractionDigits ?? 2
   return formatter.format(minor / 10 ** digits)
 }
+
+/**
+ * Parse a user-entered price DELTA (an option surcharge) in major units into
+ * integer minor units. Unlike an item price, a delta may be zero or negative
+ * (a discount). Returns null for anything not matching -?digits(.dd) — mirrors
+ * the strict parse in the item form (rejects "", "1e3", "1.234").
+ */
+export function parsePriceDeltaToMinor(raw: string): number | null {
+  const trimmed = raw.trim()
+  if (!/^-?\d+(\.\d{1,2})?$/.test(trimmed)) return null
+  const minor = Math.round(Number.parseFloat(trimmed) * 100)
+  if (Math.abs(minor) > 100_000_000) return null // > £1,000,000 guard
+  return minor
+}
