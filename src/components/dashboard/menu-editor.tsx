@@ -21,10 +21,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import {
-  ItemFormSheet,
-  type EditorItem,
-} from "@/components/dashboard/item-form-sheet"
+import { ItemFormSheet } from "@/components/dashboard/item-form-sheet"
+import type {
+  EditorItem,
+  EditorMenuItem,
+} from "@/components/dashboard/menu-types"
 import { t } from "@/lib/i18n"
 import { formatMinor } from "@/lib/money"
 import { createClient } from "@/lib/supabase/client"
@@ -34,7 +35,7 @@ type Category = {
   id: string
   name: string
   sort_order: number
-  menu_items: EditorItem[]
+  menu_items: EditorMenuItem[]
 }
 
 function IconBtn({
