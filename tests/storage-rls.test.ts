@@ -62,3 +62,41 @@ describe("Storage RLS: shop-logos", () => {
     expect(res.status).toBe(200)
   })
 })
+
+describe("Storage RLS: menu-photos", () => {
+  let a: SupabaseClient
+  let b: SupabaseClient
+  let aShop: string
+  let bShop: string
+
+  beforeAll(async () => {
+    a = await signedIn(process.env.SHOP_A_EMAIL!, process.env.SHOP_A_PASSWORD!)
+    b = await signedIn(process.env.SHOP_B_EMAIL!, process.env.SHOP_B_PASSWORD!)
+    aShop = await ownShopId(a)
+    bShop = await ownShopId(b)
+  })
+
+  afterAll(async () => {
+    await a.storage.from("menu-photos").remove([`${aShop}/rls-test.webp`])
+  })
+
+  it("A can upload under its own shop folder", async () => {
+    const { error } = await a.storage
+      .from("menu-photos")
+      .upload(`${aShop}/rls-test.webp`, PNG, {
+        contentType: "image/webp",
+        upsert: true,
+      })
+    expect(error).toBeNull()
+  })
+
+  it("A CANNOT upload under B's shop folder", async () => {
+    const { error } = await a.storage
+      .from("menu-photos")
+      .upload(`${bShop}/hack.webp`, PNG, {
+        contentType: "image/webp",
+        upsert: true,
+      })
+    expect(error).not.toBeNull()
+  })
+})
