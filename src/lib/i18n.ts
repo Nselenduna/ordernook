@@ -238,6 +238,12 @@ const dict = {
   "editor.optionDelta": "Price change (£)",
   "editor.deleteOption": "Delete option",
   "editor.requiredNoOptions": "Add at least one option, or customers can't order this item.",
+  "editor.photo": "Photo",
+  "editor.choosePhoto": "Add photo",
+  "editor.changePhoto": "Change photo",
+  "editor.removePhoto": "Remove",
+  "editor.photoTooLarge": "That image is too large (max 10 MB).",
+  "editor.photoFailed": "Couldn't upload the photo — try again.",
 } as const
 
 export type I18nKey = keyof typeof dict

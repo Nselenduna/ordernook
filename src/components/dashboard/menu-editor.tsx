@@ -201,6 +201,14 @@ export function MenuEditor({
                   key={it.id}
                   className="flex items-center gap-1 rounded-xl border border-border bg-background p-2"
                 >
+                  {it.photo_url && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={it.photo_url}
+                      alt=""
+                      className="size-9 shrink-0 rounded-lg object-cover"
+                    />
+                  )}
                   <span className="min-w-0 flex-1">
                     <span className={cn("font-medium", !it.is_available && "text-muted-foreground line-through")}>
                       {it.name}

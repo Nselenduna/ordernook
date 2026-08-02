@@ -18,6 +18,7 @@ import { t } from "@/lib/i18n"
 import { createClient } from "@/lib/supabase/client"
 import { cn } from "@/lib/utils"
 import { UK_ALLERGENS } from "@/lib/allergens"
+import { ItemPhotoField } from "@/components/dashboard/item-photo-field"
 
 export type EditorItem = {
   id: string
@@ -29,6 +30,7 @@ export type EditorItem = {
   sort_order: number
   category_id: string
   allergens: string[]
+  photo_url: string | null
 }
 
 export function ItemFormSheet({
@@ -60,6 +62,23 @@ export function ItemFormSheet({
     new Set(item?.allergens ?? [])
   )
   const [saving, setSaving] = useState(false)
+  const [photoPreview, setPhotoPreview] = useState<string | null>(
+    item?.photo_url ?? null
+  )
+  const [photoFile, setPhotoFile] = useState<File | null>(null)
+  const [photoRemoved, setPhotoRemoved] = useState(false)
+
+  const choosePhoto = (file: File) => {
+    if (file.size > 10 * 1024 * 1024) return toast.error(t("editor.photoTooLarge"))
+    setPhotoFile(file)
+    setPhotoRemoved(false)
+    setPhotoPreview(URL.createObjectURL(file))
+  }
+  const removePhoto = () => {
+    setPhotoFile(null)
+    setPhotoRemoved(true)
+    setPhotoPreview(null)
+  }
 
   const toggleAllergen = (key: string) =>
     setAllergens((prev) => {
@@ -86,17 +105,44 @@ export function ItemFormSheet({
       category_id: categoryId,
       allergens: [...allergens],
     }
-    const { error } = item
-      ? await supabase.from("menu_items").update(fields).eq("id", item.id)
-      : await supabase.from("menu_items").insert({
-          ...fields,
-          shop_id: shopId,
-          currency,
-          is_available: true,
-          sort_order: nextSortOrder,
-        })
+
+    let itemId = item?.id
+    if (item) {
+      const { error } = await supabase.from("menu_items").update(fields).eq("id", item.id)
+      if (error) {
+        setSaving(false)
+        return toast.error(t("editor.saveFailed"))
+      }
+    } else {
+      const { data, error } = await supabase
+        .from("menu_items")
+        .insert({ ...fields, shop_id: shopId, currency, is_available: true, sort_order: nextSortOrder })
+        .select("id")
+        .single()
+      if (error || !data) {
+        setSaving(false)
+        return toast.error(t("editor.saveFailed"))
+      }
+      itemId = data.id
+    }
+
+    // Photo is uploaded only after the item row exists — a cancelled new item
+    // leaves nothing in storage.
+    if (photoFile && itemId) {
+      const body = new FormData()
+      body.append("file", photoFile)
+      body.append("item_id", itemId)
+      const res = await fetch("/api/menu/photo", { method: "POST", body })
+      if (!res.ok) {
+        setSaving(false)
+        return toast.error(t("editor.photoFailed"))
+      }
+    } else if (photoRemoved && item?.photo_url && itemId) {
+      await supabase.storage.from("menu-photos").remove([`${shopId}/${itemId}.webp`])
+      await supabase.from("menu_items").update({ photo_url: null }).eq("id", itemId)
+    }
+
     setSaving(false)
-    if (error) return toast.error(t("editor.saveFailed"))
     toast.success(t("editor.saved"))
     onOpenChange(false)
     router.refresh()
@@ -204,6 +250,12 @@ export function ItemFormSheet({
               })}
             </div>
           </div>
+
+          <ItemPhotoField
+            previewUrl={photoPreview}
+            onChoose={choosePhoto}
+            onRemove={removePhoto}
+          />
 
           <Button
             type="button"
