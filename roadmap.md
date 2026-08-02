@@ -18,11 +18,11 @@
 - 26 Jul 2026: **Deployed to Vercel** (project `lloydmgutshini-projects/order-ahead`). Live over HTTPS at https://order-ahead-omega.vercel.app/corner-grind — menu renders from Supabase, no console errors. Env vars (Supabase + VAPID) set for production + preview. First deploy landed as production (no users/custom domain yet).
 - 26 Jul 2026: **Slices 1, 3, 2a SHIPPED** to production (ordernook.uk) — Go-Live Kit, Shop Profile & Branding, Menu Editor (items & categories). See state.md.
 - 1 Aug 2026: **Slice 2b (option groups & options editor) SHIPPED** — pushed (3760386) + deployed to production (ordernook.uk). UI-only; full suite 27 passing. Specs: `phase1-slice2b-options-editor.md` (+ `-plan.md`).
-- 2 Aug 2026: **Slice 2c (item photos) BUILT + verified locally, committed to master (not yet pushed/deployed).** New `menu-photos` bucket + RLS (migration already applied to remote), sharp upload route, item-form photo picker, customer card thumbnail + item-sheet hero. Full suite 29 passing. Specs: `phase1-slice2c-item-photos.md` (+ `-plan.md`). **Slice 2 (2a/2b/2c) complete.**
+- 2 Aug 2026: **Slice 2c (item photos) SHIPPED** — pushed + deployed to production (ordernook.uk). New `menu-photos` bucket + RLS, sharp upload route, item-form photo picker, customer card thumbnail + item-sheet hero. Full suite 29 passing. **Slice 2 (2a/2b/2c) complete — Phase 1 shop tools done bar self-serve registration (Slice 4).**
 
 ## Next
-- **Ship Slice 2c:** `git push origin master` + Vercel CLI deploy (storage migration already live, so deploy is code-only).
-- Then **Phase 2** — payments (Stripe Connect, direct charges; reuse BookOnTheMap scaffolding).
+- **Phase 2** — payments (Stripe Connect, direct charges; reuse BookOnTheMap scaffolding).
+- Before pilot: wire **Sentry DSN** (still a placeholder — part of definition of done).
 
 ## Later / open
 - Before writing landing/marketing copy: run the AUDIENCE.md 4-question interview → audience.md.
