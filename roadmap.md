@@ -17,10 +17,9 @@
 - 26 Jul 2026: Schema exported to `supabase/migrations/` (5 baseline migrations, local↔remote in sync); Supabase project moved to Zizwe org, Pro tier.
 - 26 Jul 2026: **Deployed to Vercel** (project `lloydmgutshini-projects/order-ahead`). Live over HTTPS at https://order-ahead-omega.vercel.app/corner-grind — menu renders from Supabase, no console errors. Env vars (Supabase + VAPID) set for production + preview. First deploy landed as production (no users/custom domain yet).
 - 26 Jul 2026: **Slices 1, 3, 2a SHIPPED** to production (ordernook.uk) — Go-Live Kit, Shop Profile & Branding, Menu Editor (items & categories). See state.md.
-- 1 Aug 2026: **Slice 2b (option groups & options editor) BUILT + verified locally, committed to master (not yet pushed/deployed).** UI-only; full suite 27 passing. Specs: `phase1-slice2b-options-editor.md` (+ `-plan.md`).
+- 1 Aug 2026: **Slice 2b (option groups & options editor) SHIPPED** — pushed (3760386) + deployed to production (ordernook.uk). UI-only; full suite 27 passing. Specs: `phase1-slice2b-options-editor.md` (+ `-plan.md`).
 
 ## Next
-- **Ship Slice 2b:** `git push origin master` + Vercel CLI deploy → ordernook.uk.
 - **Slice 2c** — item photos (reuse Slice 3 Storage + sharp pipeline).
 - Then **Phase 2** — payments (Stripe Connect, direct charges; reuse BookOnTheMap scaffolding).
 
