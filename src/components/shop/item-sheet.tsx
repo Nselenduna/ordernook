@@ -181,6 +181,14 @@ function ItemSheetBody({
 
   return (
     <>
+      {item.photo_url && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={item.photo_url}
+          alt=""
+          className="h-40 w-full rounded-t-3xl object-cover"
+        />
+      )}
       <SheetHeader className="pb-2">
         <SheetTitle className="font-heading text-2xl">{item.name}</SheetTitle>
         <SheetDescription>

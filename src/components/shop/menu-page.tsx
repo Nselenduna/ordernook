@@ -35,6 +35,14 @@ function ItemCard({
         !item.is_available && "opacity-60"
       )}
     >
+      {item.photo_url && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={item.photo_url}
+          alt=""
+          className="size-16 shrink-0 rounded-2xl object-cover"
+        />
+      )}
       <span className="flex flex-col gap-1">
         <span className="font-medium">{item.name}</span>
         {item.description && (
