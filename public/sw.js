@@ -35,9 +35,12 @@ self.addEventListener("fetch", (event) => {
 
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
+  // Never cache on localhost: dev (Turbopack) chunk names are NOT content-hashed,
+  // so a cache-first hit would serve stale JS after edits. Prod assets are hashed.
+  if (url.hostname === "localhost" || url.hostname === "127.0.0.1") return;
   if (!isCacheable(url)) return; // network as normal — nothing else is cached
 
-  // Cache-first: build assets are content-hashed, so stale entries can't happen.
+  // Cache-first: prod build assets are content-hashed, so stale entries can't happen.
   event.respondWith(
     caches.match(request).then(
       (cached) =>
