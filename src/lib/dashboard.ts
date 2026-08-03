@@ -23,3 +23,25 @@ export async function getStaffShop(): Promise<Tables<"shops"> | null> {
 
   return (staff?.shops as Tables<"shops"> | undefined) ?? null;
 }
+
+/**
+ * Same lookup, but returns null (never redirects) when there's no session.
+ * For the dashboard layout, which wraps the login page — the proxy already
+ * gates auth, so the layout must not redirect (that would loop on /login).
+ */
+export async function getStaffShopOrNull(): Promise<Tables<"shops"> | null> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return null;
+
+  const { data: staff } = await supabase
+    .from("staff_users")
+    .select("shops(*)")
+    .eq("auth_user_id", user.id)
+    .limit(1)
+    .maybeSingle();
+
+  return (staff?.shops as Tables<"shops"> | undefined) ?? null;
+}

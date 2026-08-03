@@ -245,6 +245,18 @@ const dict = {
   "editor.removePhoto": "Remove",
   "editor.photoTooLarge": "That image is too large (max 10 MB).",
   "editor.photoFailed": "Couldn't upload the photo — try again.",
+  "billing.plan": "Plan",
+  "billing.basic": "Basic — £12/mo",
+  "billing.proSoon": "Pro — coming soon",
+  "billing.trialLeft": "Trial: {days} days left",
+  "billing.trialEnded": "Your free trial has ended",
+  "billing.active": "Active",
+  "billing.subscribe": "Subscribe",
+  "billing.manage": "Manage billing",
+  "billing.opening": "Opening…",
+  "billing.lockTitle": "Subscribe to keep taking orders",
+  "billing.lockBody": "Your OrderNook trial has ended. Subscribe to Basic (£12/mo) to unlock your dashboard and start taking orders again.",
+  "billing.failed": "Couldn't open billing — try again.",
 } as const
 
 export type I18nKey = keyof typeof dict
