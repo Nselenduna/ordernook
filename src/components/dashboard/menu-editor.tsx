@@ -199,7 +199,7 @@ export function MenuEditor({
               {items.map((it, ii) => (
                 <li
                   key={it.id}
-                  className="flex items-center gap-1 rounded-xl border border-border bg-background p-2"
+                  className="flex flex-wrap items-center gap-1 rounded-xl border border-border bg-background p-2"
                 >
                   {it.photo_url && (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -209,41 +209,43 @@ export function MenuEditor({
                       className="size-9 shrink-0 rounded-lg object-cover"
                     />
                   )}
-                  <span className="min-w-0 flex-1">
-                    <span className={cn("font-medium", !it.is_available && "text-muted-foreground line-through")}>
+                  <span className="flex min-w-0 flex-1 basis-32 items-baseline gap-2">
+                    <span className={cn("truncate font-medium", !it.is_available && "text-muted-foreground line-through")}>
                       {it.name}
                     </span>
-                    <span className="ml-2 text-sm text-muted-foreground tabular-nums">
+                    <span className="shrink-0 text-sm text-muted-foreground tabular-nums">
                       {formatMinor(it.price_minor, it.currency)}
                     </span>
                   </span>
-                  <IconBtn label={t("editor.moveUp")} disabled={ii === 0} onClick={() => swapItem(it, items[ii - 1])}>
-                    <ChevronUpIcon className="size-4" />
-                  </IconBtn>
-                  <IconBtn label={t("editor.moveDown")} disabled={ii === items.length - 1} onClick={() => swapItem(it, items[ii + 1])}>
-                    <ChevronDownIcon className="size-4" />
-                  </IconBtn>
-                  <button
-                    type="button"
-                    onClick={() => toggleAvailable(it)}
-                    className={cn(
-                      "h-8 shrink-0 rounded-full px-3 text-xs font-medium",
-                      it.is_available
-                        ? "bg-secondary text-secondary-foreground"
-                        : "bg-destructive/10 text-destructive"
-                    )}
-                  >
-                    {it.is_available ? t("menu.available") : t("menu.markSoldOut")}
-                  </button>
-                  <IconBtn label={t("editor.options")} onClick={() => setOptionsItemId(it.id)}>
-                    <SlidersHorizontalIcon className="size-4" />
-                  </IconBtn>
-                  <IconBtn label={t("editor.editItem")} onClick={() => openEdit(it)}>
-                    <PencilIcon className="size-4" />
-                  </IconBtn>
-                  <IconBtn label={t("editor.deleteItem")} onClick={() => setDeleteTarget(it)}>
-                    <Trash2Icon className="size-4" />
-                  </IconBtn>
+                  <div className="flex shrink-0 items-center gap-1">
+                    <IconBtn label={t("editor.moveUp")} disabled={ii === 0} onClick={() => swapItem(it, items[ii - 1])}>
+                      <ChevronUpIcon className="size-4" />
+                    </IconBtn>
+                    <IconBtn label={t("editor.moveDown")} disabled={ii === items.length - 1} onClick={() => swapItem(it, items[ii + 1])}>
+                      <ChevronDownIcon className="size-4" />
+                    </IconBtn>
+                    <button
+                      type="button"
+                      onClick={() => toggleAvailable(it)}
+                      className={cn(
+                        "h-8 shrink-0 rounded-full px-3 text-xs font-medium",
+                        it.is_available
+                          ? "bg-secondary text-secondary-foreground"
+                          : "bg-destructive/10 text-destructive"
+                      )}
+                    >
+                      {it.is_available ? t("menu.available") : t("menu.markSoldOut")}
+                    </button>
+                    <IconBtn label={t("editor.options")} onClick={() => setOptionsItemId(it.id)}>
+                      <SlidersHorizontalIcon className="size-4" />
+                    </IconBtn>
+                    <IconBtn label={t("editor.editItem")} onClick={() => openEdit(it)}>
+                      <PencilIcon className="size-4" />
+                    </IconBtn>
+                    <IconBtn label={t("editor.deleteItem")} onClick={() => setDeleteTarget(it)}>
+                      <Trash2Icon className="size-4" />
+                    </IconBtn>
+                  </div>
                 </li>
               ))}
             </ul>
