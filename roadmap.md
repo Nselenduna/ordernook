@@ -20,9 +20,11 @@
 - 1 Aug 2026: **Slice 2b (option groups & options editor) SHIPPED** — pushed (3760386) + deployed to production (ordernook.uk). UI-only; full suite 27 passing. Specs: `phase1-slice2b-options-editor.md` (+ `-plan.md`).
 - 2 Aug 2026: **Slice 2c (item photos) SHIPPED** — pushed + deployed to production (ordernook.uk). New `menu-photos` bucket + RLS, sharp upload route, item-form photo picker, customer card thumbnail + item-sheet hero. Full suite 29 passing. **Slice 2 (2a/2b/2c) complete — Phase 1 shop tools done bar self-serve registration (Slice 4).**
 
+- 2 Aug 2026: **Sentry LIVE (Phase A)** — @sentry/nextjs client+server+edge, project `ordernook` (zizweit org), PII off, no replay. Verified on prod. Source maps (Phase B) pending SENTRY_AUTH_TOKEN in Vercel. Specs: `sentry-integration.md` (+ `-plan.md`).
+
 ## Next
 - **Phase 2** — payments (Stripe Connect, direct charges; reuse BookOnTheMap scaffolding).
-- Before pilot: wire **Sentry DSN** (still a placeholder — part of definition of done).
+- **Sentry Phase B** (Lloyd): add `SENTRY_AUTH_TOKEN` to Vercel → source-mapped stack traces.
 
 ## Later / open
 - Before writing landing/marketing copy: run the AUDIENCE.md 4-question interview → audience.md.
