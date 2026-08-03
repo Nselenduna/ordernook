@@ -45,10 +45,11 @@ export async function POST(request: Request) {
         .resize(size, size, { fit: "cover", position: "centre" })
         .png()
         .toBuffer()
+      // Pass a Blob, not a Node Buffer: a raw Buffer body is UTF-8-stringified
+      // by undici on Vercel (corrupting the image); a Blob goes as multipart.
       const { error } = await supabase.storage
         .from("shop-logos")
-        .upload(`${shopId}/icon-${size}.png`, png, {
-          contentType: "image/png",
+        .upload(`${shopId}/icon-${size}.png`, new Blob([new Uint8Array(png)], { type: "image/png" }), {
           upsert: true,
         })
       if (error)

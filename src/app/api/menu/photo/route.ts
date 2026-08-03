@@ -56,9 +56,14 @@ export async function POST(request: Request) {
   }
 
   const path = `${item.shop_id}/${itemId}.webp`
+  // Pass a Blob, not a Node Buffer: supabase-js sends a Blob as multipart
+  // form-data (binary-safe), whereas a raw Buffer body is UTF-8-stringified by
+  // undici on Vercel — corrupting the image (the "broken image" bug).
   const { error: upErr } = await supabase.storage
     .from("menu-photos")
-    .upload(path, webp, { contentType: "image/webp", upsert: true })
+    .upload(path, new Blob([new Uint8Array(webp)], { type: "image/webp" }), {
+      upsert: true,
+    })
   if (upErr)
     return NextResponse.json({ error: "upload_failed" }, { status: 500 })
 
