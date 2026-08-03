@@ -425,8 +425,10 @@ export type Database = {
           prep_minutes: number
           slug: string
           stripe_account_id: string | null
+          stripe_customer_id: string | null
           stripe_subscription_id: string | null
           subscription_status: string
+          trial_ends_at: string | null
         }
         Insert: {
           branding?: Json
@@ -441,8 +443,10 @@ export type Database = {
           prep_minutes?: number
           slug: string
           stripe_account_id?: string | null
+          stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           subscription_status?: string
+          trial_ends_at?: string | null
         }
         Update: {
           branding?: Json
@@ -457,8 +461,10 @@ export type Database = {
           prep_minutes?: number
           slug?: string
           stripe_account_id?: string | null
+          stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           subscription_status?: string
+          trial_ends_at?: string | null
         }
         Relationships: [
           {
@@ -518,6 +524,7 @@ export type Database = {
         Returns: Json
       }
       get_order_by_token: { Args: { p_token: string }; Returns: Json }
+      is_entitled: { Args: { p_shop_id: string }; Returns: boolean }
       is_staff_of: { Args: { target_shop: string }; Returns: boolean }
     }
     Enums: {
