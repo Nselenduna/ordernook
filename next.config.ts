@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { withSentryConfig } from "@sentry/nextjs";
 
 const nextConfig: NextConfig = {
   // Pin the workspace root (a stray lockfile on the Desktop confuses inference).
@@ -11,4 +12,13 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ["sharp"],
 };
 
-export default nextConfig;
+export default withSentryConfig(nextConfig, {
+  org: "zizweit",
+  project: "ordernook",
+  silent: !process.env.CI, // quiet locally; verbose in CI
+  widenClientFileUpload: true,
+  // Upload source maps for readable stack traces, then delete them from the
+  // build output so they're never served to users. Uploads only when
+  // SENTRY_AUTH_TOKEN is in the build env (Vercel); no-ops without it.
+  sourcemaps: { deleteSourcemapsAfterUpload: true },
+});
