@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 import { MenuPage } from "@/components/shop/menu-page";
 import { brandingVars, parseBranding } from "@/lib/branding";
+import { isEntitled } from "@/lib/entitlement";
 import { t } from "@/lib/i18n";
 import { createClient } from "@/lib/supabase/server";
 import type { CategoryWithItems } from "@/lib/types";
@@ -68,7 +69,8 @@ export default async function ShopPage({ params }: Props) {
   const branding = parseBranding(shop.branding);
   const vars = brandingVars(branding);
 
-  if (shop.is_paused) {
+  // Locked (unentitled) shops pause ordering too — same neutral message.
+  if (shop.is_paused || !isEntitled(shop)) {
     return (
       <main
         className="theme-latte flex flex-1 flex-col items-center justify-center gap-3 bg-background px-6 text-center text-foreground"
