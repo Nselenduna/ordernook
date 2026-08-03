@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { getStaffShop } from "@/lib/dashboard"
-import { createClient } from "@/lib/supabase/server"
+import { createAdminClient } from "@/lib/supabase/admin"
 import { getStripe } from "@/lib/stripe"
 
 export const runtime = "nodejs"
@@ -23,8 +23,10 @@ export async function POST() {
       metadata: { shop_id: shop.id, shop_slug: shop.slug },
     })
     customerId = customer.id
-    const supabase = await createClient()
-    await supabase
+    // Admin client: stripe_customer_id is a billing column, blocked for the
+    // authenticated user by the protect_shop_billing trigger.
+    const admin = createAdminClient()
+    await admin
       .from("shops")
       .update({ stripe_customer_id: customerId })
       .eq("id", shop.id)
