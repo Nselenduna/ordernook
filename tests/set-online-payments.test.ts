@@ -18,10 +18,12 @@ async function signedIn(email: string, password: string): Promise<SupabaseClient
 describe("set_online_payments", () => {
   let withAcct: SupabaseClient
   let noAcct: SupabaseClient
+  let noShop: SupabaseClient
 
   beforeAll(async () => {
     withAcct = await signedIn(process.env.SHOP_A_EMAIL!, process.env.SHOP_A_PASSWORD!)
     noAcct = await signedIn(process.env.SHOP_B_EMAIL!, process.env.SHOP_B_PASSWORD!)
+    noShop = await signedIn(process.env.REGISTER_TEST_EMAIL!, process.env.REGISTER_TEST_PASSWORD!)
   })
 
   it("enable without a connected account is rejected", async () => {
@@ -43,5 +45,25 @@ describe("set_online_payments", () => {
     const modes = (data as { payment_modes: string[] }).payment_modes
     expect(modes).not.toContain("online")
     expect(modes).toContain("in_store")
+  })
+
+  it("anon cannot call (blocked at grant)", async () => {
+    const fresh = createClient(url, anon)
+    const { error } = await fresh.rpc("set_online_payments", { p_enabled: true })
+    expect(error?.message ?? "").toContain("permission denied")
+  })
+
+  it("signed-in user with no shop is rejected", async () => {
+    const { error } = await noShop.rpc("set_online_payments", { p_enabled: true })
+    expect(error?.message ?? "").toContain("no_shop")
+  })
+
+  it("direct PATCH of payment_modes is blocked (bypass closed)", async () => {
+    const { data: me } = await withAcct.from("staff_users").select("shop_id").single()
+    const { error } = await withAcct
+      .from("shops")
+      .update({ payment_modes: ["in_store", "online"] })
+      .eq("id", (me as { shop_id: string }).shop_id)
+    expect(error).not.toBeNull()
   })
 })

@@ -48,3 +48,7 @@ $$;
 
 revoke all on function public.set_online_payments(boolean) from public, anon;
 grant execute on function public.set_online_payments(boolean) to authenticated;
+
+-- payment_modes may only be changed through set_online_payments / the admin
+-- client — never a direct authed PATCH (which would bypass the account gate).
+revoke update (payment_modes) on public.shops from authenticated, anon;
