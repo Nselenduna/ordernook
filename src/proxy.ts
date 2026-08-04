@@ -5,6 +5,8 @@ import { NextResponse, type NextRequest } from "next/server"
  * Next 16 proxy (replaces middleware.ts). Runs on /dashboard routes only:
  * refreshes the Supabase auth session cookie and gates access —
  * unauthenticated users go to /dashboard/login, signed-in users skip it.
+ * /dashboard/login and /dashboard/register are both public (no-user pages);
+ * everything else under /dashboard requires a signed-in user.
  */
 export default async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request })
@@ -36,10 +38,14 @@ export default async function proxy(request: NextRequest) {
   } = await supabase.auth.getUser()
 
   const isLoginPage = request.nextUrl.pathname.startsWith("/dashboard/login")
+  const isRegisterPage = request.nextUrl.pathname.startsWith("/dashboard/register")
 
-  if (!user && !isLoginPage) {
+  if (!user && !isLoginPage && !isRegisterPage) {
     return NextResponse.redirect(new URL("/dashboard/login", request.url))
   }
+  // Login-only: an authenticated user must be allowed to STAY on /dashboard/register,
+  // since its recovery mode handles authed-but-no-shop users (and it redirects to
+  // /dashboard itself once a shop exists).
   if (user && isLoginPage) {
     return NextResponse.redirect(new URL("/dashboard", request.url))
   }
