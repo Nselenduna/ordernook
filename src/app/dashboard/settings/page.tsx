@@ -3,11 +3,21 @@ import { DashboardNav } from "@/components/dashboard/dashboard-nav";
 import { ShopSettings } from "@/components/dashboard/shop-settings";
 import { PlanCard } from "@/components/dashboard/plan-card";
 import { getStaffShop } from "@/lib/dashboard";
+import { reconcileFromCheckoutSession } from "@/lib/billing";
 import { t } from "@/lib/i18n";
 
 export const metadata: Metadata = { title: t("nav.settings") };
 
-export default async function SettingsPage() {
+export default async function SettingsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ session_id?: string }>;
+}) {
+  // Returning from Stripe Checkout → sync the subscription straight from Stripe
+  // (don't wait on the webhook) so the shop is unlocked the moment they land.
+  const { session_id } = await searchParams;
+  if (session_id) await reconcileFromCheckoutSession(session_id);
+
   const shop = await getStaffShop();
   if (!shop) return null;
   // Computed here (server) so PlanCard stays pure and SSR-stable.

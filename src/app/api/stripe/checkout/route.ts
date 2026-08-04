@@ -36,7 +36,7 @@ export async function POST() {
     mode: "subscription",
     customer: customerId,
     line_items: [{ price, quantity: 1 }],
-    success_url: `${site}/dashboard/settings?subscribed=1`,
+    success_url: `${site}/dashboard/settings?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${site}/dashboard/settings`,
     metadata: { shop_id: shop.id },
     subscription_data: { metadata: { shop_id: shop.id } },
