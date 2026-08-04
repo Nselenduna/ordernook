@@ -22,9 +22,11 @@
 
 - 2 Aug 2026: **Sentry LIVE (Phase A)** — @sentry/nextjs client+server+edge, project `ordernook` (zizweit org), PII off, no replay. Verified on prod. Source maps (Phase B) pending SENTRY_AUTH_TOKEN in Vercel. Specs: `sentry-integration.md` (+ `-plan.md`).
 
+- 3 Aug 2026: **Phase 2A (shop subscriptions) SHIPPED** — Stripe Billing, Basic £12/mo, 30-day trial then hard lock; dedicated OrderNook Stripe account. Live on ordernook.uk. Specs: `phase2a-shop-subscriptions.md` (+ `-plan.md`).
+
 ## Next
-- **Phase 2** — payments (Stripe Connect, direct charges; reuse BookOnTheMap scaffolding).
-- **Sentry Phase B** (Lloyd): add `SENTRY_AUTH_TOKEN` to Vercel → source-mapped stack traces.
+- **Phase 2B** — customer online payments (Stripe Connect Standard, direct charges; the Pro-tier differentiator). Reuse BookOnTheMap Connect scaffolding.
+- Optional: run one real £12 live subscription (test card in live is a real charge) to fully prove prod, then refund.
 
 ## Later / open
 - Before writing landing/marketing copy: run the AUDIENCE.md 4-question interview → audience.md.
