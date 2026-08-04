@@ -181,6 +181,22 @@ const dict = {
   "settings.saveButton": "Save",
   "settings.saveFailed": "Couldn't save — try again.",
 
+  // Dashboard settings — online payments (Stripe Connect)
+  "settings.online.title": "Online payments",
+  "settings.online.blurb":
+    "Let customers pay by card when they order — money goes straight to your Stripe, zero commission.",
+  "settings.online.connect": "Connect Stripe",
+  "settings.online.connected": "Connected ✓",
+  "settings.online.accept": "Accept online orders",
+  "settings.online.needAccount": "Connect Stripe first",
+  "settings.online.disconnect": "Disconnect",
+  "settings.online.disconnectConfirm":
+    "Disconnect Stripe? Customers won't be able to pay online until you reconnect.",
+  "settings.online.connectSuccess": "Stripe connected",
+  "settings.online.connectError": "Couldn't connect Stripe. Please try again.",
+  "settings.online.connectCancelled": "Stripe connection cancelled",
+  "settings.online.saveFailed": "Couldn't save. Please try again.",
+
   // Dashboard nav
   "nav.orders": "Orders",
   "nav.menu": "Menu",

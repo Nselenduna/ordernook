@@ -530,6 +530,10 @@ export type Database = {
         Args: { p_name: string; p_slug: string }
         Returns: Database["public"]["Tables"]["shops"]["Row"]
       }
+      set_online_payments: {
+        Args: { p_enabled: boolean }
+        Returns: Database["public"]["Tables"]["shops"]["Row"]
+      }
     }
     Enums: {
       option_group_type: "single" | "multi"
