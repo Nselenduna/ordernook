@@ -58,12 +58,12 @@ describe("set_online_payments", () => {
     expect(error?.message ?? "").toContain("no_shop")
   })
 
-  it("direct PATCH of payment_modes is blocked (bypass closed)", async () => {
-    const { data: me } = await withAcct.from("staff_users").select("shop_id").single()
-    const { error } = await withAcct
+  it("direct PATCH enabling online without an account is blocked", async () => {
+    const { data: me } = await noAcct.from("staff_users").select("shop_id").single()
+    const { error } = await noAcct
       .from("shops")
       .update({ payment_modes: ["in_store", "online"] })
       .eq("id", (me as { shop_id: string }).shop_id)
-    expect(error).not.toBeNull()
+    expect(error?.message ?? "").toContain("online_requires_account")
   })
 })

@@ -49,6 +49,28 @@ $$;
 revoke all on function public.set_online_payments(boolean) from public, anon;
 grant execute on function public.set_online_payments(boolean) to authenticated;
 
--- payment_modes may only be changed through set_online_payments / the admin
--- client — never a direct authed PATCH (which would bypass the account gate).
-revoke update (payment_modes) on public.shops from authenticated, anon;
+-- 'online' in payment_modes requires a connected Stripe account. Enforced for
+-- direct authenticated/anon writes (which would otherwise bypass
+-- set_online_payments via the all-columns shops_staff_update RLS policy).
+-- The SECURITY DEFINER RPC only enables online when an account is present, and
+-- the admin disconnect removes online in the same write, so both pass.
+create or replace function public.enforce_online_requires_account()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $fn$
+begin
+  if auth.role() in ('authenticated', 'anon')
+     and 'online' = any(new.payment_modes)
+     and new.stripe_account_id is null then
+    raise exception 'online_requires_account' using errcode = 'P0001';
+  end if;
+  return new;
+end;
+$fn$;
+
+drop trigger if exists enforce_online_requires_account on public.shops;
+create trigger enforce_online_requires_account
+  before insert or update on public.shops
+  for each row execute function public.enforce_online_requires_account();
