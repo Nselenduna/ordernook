@@ -186,7 +186,7 @@ function ItemSheetBody({
         <img
           src={item.photo_url}
           alt=""
-          className="h-40 w-full rounded-t-3xl object-cover"
+          className="aspect-[4/3] max-h-80 w-full rounded-t-3xl bg-muted object-cover"
         />
       )}
       <SheetHeader className="pb-2">

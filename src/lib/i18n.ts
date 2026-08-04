@@ -95,6 +95,10 @@ const dict = {
   "login.error": "Sign-in failed. Check your email and password.",
   "login.createShop": "New here? Create your shop",
 
+  // Password field toggle (shared: login + registration)
+  "auth.showPassword": "Show password",
+  "auth.hidePassword": "Hide password",
+
   // Dashboard self-serve registration
   "register.title": "Create your shop",
   "register.subtitle": "Start your 30-day free trial. No card needed.",

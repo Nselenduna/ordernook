@@ -13,6 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { t } from "@/lib/i18n";
 import { createClient } from "@/lib/supabase/client";
@@ -67,9 +68,8 @@ export default function DashboardLoginPage() {
             </div>
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="login-password">{t("login.password")}</Label>
-              <Input
+              <PasswordInput
                 id="login-password"
-                type="password"
                 required
                 autoComplete="current-password"
                 value={password}
