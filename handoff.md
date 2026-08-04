@@ -6,6 +6,23 @@ loop now has two independent paths that both write subscription state to the DB:
 1. **On-return reconciliation** (covers the subscribe moment) — verified test-mode.
 2. **Live Stripe webhook** (covers lifecycle: renewals, cancels, failed payments) — verified live.
 
+**Slice 4 — Self-serve registration is MERGED to master (NOT yet deployed).** Owner signup at
+`/dashboard/register` (name+email+password → `register_shop` SECURITY DEFINER RPC → shop on a
+30-day trial → dashboard). Built via subagent-driven TDD; 50/50 tests pass; whole-branch review
+ship-ready. RPC migration `20260804140000_register_shop.sql` already applied to the OrderNook DB.
+Verified end-to-end in browser via the recovery-mode path (RPC creates shop correctly); only the
+`signUp()` call itself is unexercised, gated on the setting below.
+
+### ⚠️ DEPLOY GATE for Slice 4 (do before `vercel --prod`)
+- **Disable "Confirm email"** in Supabase Auth (OrderNook → Authentication → Email/Providers).
+  The design requires instant access; with confirm ON, signup shows "check your email" and the
+  shop is never created (broken UX). `mailer_autoconfirm` is currently `false` (confirm ON).
+- Optional: disable email-enumeration protection so duplicate-email shows "already registered"
+  rather than the confirm-email message.
+- Then deploy: `vercel --prod --yes`. Not deployed yet precisely because of this gate.
+- Docs: [phase1-slice4-self-serve-registration.md](phase1-slice4-self-serve-registration.md) (spec)
+  + `-plan.md` (implementation plan).
+
 ## Run it
 ```
 cd "C:\Users\lloyd\OneDrive\Desktop\Projexts 2025\OrderNook\order-ahead"
