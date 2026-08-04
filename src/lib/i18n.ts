@@ -117,6 +117,7 @@ const dict = {
     "That email's already registered — log in instead.",
   "register.errorConfirmEmail": "Check your email to confirm, then log in.",
   "register.errorGeneric": "Something went wrong. Please try again.",
+  "register.errorPassword": "Password must be at least 6 characters.",
   "register.recoveryNote":
     "Your account's ready — just name your shop to finish.",
 

@@ -113,10 +113,16 @@ export default function RegisterPage() {
         const { data, error } = await supabase.auth.signUp({ email: email.trim(), password })
         if (error) {
           if (/registered|already/i.test(error.message)) setEmailErr(t("register.errorEmailTaken"))
-          else toast.error(error.message)
+          else if (/password/i.test(error.message)) toast.error(t("register.errorPassword"))
+          else toast.error(t("register.errorGeneric"))
           return
         }
         if (!data.session) { toast.error(t("register.errorConfirmEmail")); return }
+        // signUp succeeded — if createShop() below fails (e.g. slug lost the race),
+        // a retry must not re-call signUp with the now-existing email (which would
+        // wrongly show "already registered"). Recovery mode retries go straight to
+        // the RPC with just name+slug, which is correct since the account now exists.
+        setRecovery(true)
       }
       await createShop()
     } finally {
@@ -135,7 +141,7 @@ export default function RegisterPage() {
           <form onSubmit={onSubmit} className="flex flex-col gap-4">
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="reg-name">{t("register.name")}</Label>
-              <Input id="reg-name" required value={name} placeholder={t("register.namePlaceholder")}
+              <Input id="reg-name" required maxLength={80} value={name} placeholder={t("register.namePlaceholder")}
                 onChange={(e) => onName(e.target.value)} className="h-11 rounded-xl" />
             </div>
             <div className="flex flex-col gap-1.5">
