@@ -188,7 +188,6 @@ const dict = {
   "settings.online.connect": "Connect Stripe",
   "settings.online.connected": "Connected ✓",
   "settings.online.accept": "Accept online orders",
-  "settings.online.needAccount": "Connect Stripe first",
   "settings.online.disconnect": "Disconnect",
   "settings.online.disconnectConfirm":
     "Disconnect Stripe? Customers won't be able to pay online until you reconnect.",

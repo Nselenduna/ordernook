@@ -16,14 +16,21 @@ export function OnlinePaymentsCard({
   const supabase = createClient()
   const [enabled, setEnabled] = useState(onlineEnabled)
   const [busy, setBusy] = useState(false)
+  const [toggling, setToggling] = useState(false)
 
   const toggle = async () => {
+    if (toggling) return // guard against double-click racing the closure's stale `enabled`
+    setToggling(true)
     const next = !enabled
     setEnabled(next) // optimistic
-    const { error } = await supabase.rpc("set_online_payments", { p_enabled: next })
-    if (error) {
-      setEnabled(!next)
-      toast.error(t("settings.online.saveFailed"))
+    try {
+      const { error } = await supabase.rpc("set_online_payments", { p_enabled: next })
+      if (error) {
+        setEnabled(!next)
+        toast.error(t("settings.online.saveFailed"))
+      }
+    } finally {
+      setToggling(false)
     }
   }
 
@@ -56,11 +63,15 @@ export function OnlinePaymentsCard({
             {t("settings.online.connected")}
           </span>
           <div className="flex items-center justify-between">
-            <span className="text-sm">{t("settings.online.accept")}</span>
+            <span id="accept-online-label" className="text-sm">
+              {t("settings.online.accept")}
+            </span>
             <button
               type="button"
               role="switch"
               aria-checked={enabled}
+              aria-labelledby="accept-online-label"
+              disabled={toggling}
               onClick={toggle}
               className={cn(
                 "h-9 shrink-0 rounded-full px-4 text-sm font-medium transition-colors",
