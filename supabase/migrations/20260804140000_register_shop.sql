@@ -24,6 +24,10 @@ begin
     raise exception 'not_authenticated' using errcode = 'P0001';
   end if;
 
+  -- Serialize concurrent registrations by the same user so the
+  -- already_registered guard below cannot be raced (no unique(auth_user_id)).
+  perform pg_advisory_xact_lock(hashtext(v_uid::text));
+
   if exists (select 1 from public.staff_users where auth_user_id = v_uid) then
     raise exception 'already_registered' using errcode = 'P0001';
   end if;
