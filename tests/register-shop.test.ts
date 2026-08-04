@@ -28,7 +28,8 @@ describe("register_shop RPC guards", () => {
   it("anon cannot register", async () => {
     const anonClient = createClient(url, anon)
     const { error } = await anonClient.rpc("register_shop", { p_name: "X", p_slug: "some-cafe" })
-    expect(error?.message ?? "").toContain("not_authenticated")
+    expect(error).not.toBeNull()
+    expect(error?.message ?? "").toContain("permission denied")
   })
 
   it("rejects a reserved slug and writes nothing", async () => {
