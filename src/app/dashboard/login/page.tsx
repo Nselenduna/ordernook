@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -84,6 +85,11 @@ export default function DashboardLoginPage() {
               {submitting ? t("login.signingIn") : t("login.signIn")}
             </Button>
           </form>
+          <p className="mt-4 text-center text-sm text-muted-foreground">
+            <Link href="/dashboard/register" className="underline">
+              {t("login.createShop")}
+            </Link>
+          </p>
         </CardContent>
       </Card>
     </main>

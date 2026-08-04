@@ -93,6 +93,32 @@ const dict = {
   "login.signIn": "Sign in",
   "login.signingIn": "Signing in…",
   "login.error": "Sign-in failed. Check your email and password.",
+  "login.createShop": "New here? Create your shop",
+
+  // Dashboard self-serve registration
+  "register.title": "Create your shop",
+  "register.subtitle": "Start your 30-day free trial. No card needed.",
+  "register.name": "Business name",
+  "register.namePlaceholder": "The Corner Grind",
+  "register.slug": "Your shop link",
+  "register.slugChecking": "Checking…",
+  "register.slugAvailable": "✓ Available",
+  "register.slugTaken": "✗ That link is taken",
+  "register.slugTooShort": "✗ At least 3 characters",
+  "register.slugReserved": "✗ That word is reserved",
+  "register.slugInvalid": "✗ Use lowercase letters, numbers and hyphens",
+  "register.email": "Email",
+  "register.password": "Password",
+  "register.submit": "Create your shop",
+  "register.submitting": "Creating…",
+  "register.haveShop": "Already have a shop?",
+  "register.logIn": "Log in",
+  "register.errorEmailTaken":
+    "That email's already registered — log in instead.",
+  "register.errorConfirmEmail": "Check your email to confirm, then log in.",
+  "register.errorGeneric": "Something went wrong. Please try again.",
+  "register.recoveryNote":
+    "Your account's ready — just name your shop to finish.",
 
   // Dashboard
   "dash.live": "Live",

@@ -526,6 +526,10 @@ export type Database = {
       get_order_by_token: { Args: { p_token: string }; Returns: Json }
       is_entitled: { Args: { p_shop_id: string }; Returns: boolean }
       is_staff_of: { Args: { target_shop: string }; Returns: boolean }
+      register_shop: {
+        Args: { p_name: string; p_slug: string }
+        Returns: Database["public"]["Tables"]["shops"]["Row"]
+      }
     }
     Enums: {
       option_group_type: "single" | "multi"
