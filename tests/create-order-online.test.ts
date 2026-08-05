@@ -13,9 +13,17 @@ let itemId: string
 
 async function firstItem(): Promise<string> {
   const { data: shop } = await admin.from("shops").select("id").eq("slug", "corner-grind").single()
-  const { data } = await admin.from("menu_items").select("id")
-    .eq("shop_id", (shop as { id: string }).id).eq("is_available", true).limit(1).single()
-  return (data as { id: string }).id
+  const shopId = (shop as { id: string }).id
+  // items with a required option group, to exclude
+  const { data: reqGroups } = await admin
+    .from("option_groups").select("item_id, menu_items!inner(shop_id)")
+    .eq("required", true).eq("menu_items.shop_id", shopId)
+  const excluded = new Set((reqGroups ?? []).map((g: { item_id: string }) => g.item_id))
+  const { data: items } = await admin.from("menu_items").select("id")
+    .eq("shop_id", shopId).eq("is_available", true)
+  const pick = (items ?? []).map((i: { id: string }) => i.id).find((id: string) => !excluded.has(id))
+  if (!pick) throw new Error("no corner-grind item without required options")
+  return pick
 }
 
 describe("create_order payment_mode", () => {
