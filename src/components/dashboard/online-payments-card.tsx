@@ -78,7 +78,7 @@ export function OnlinePaymentsCard({
                 enabled ? "bg-(--status-ready) text-white" : "bg-muted text-foreground"
               )}
             >
-              {enabled ? "On" : "Off"}
+              {t(enabled ? "settings.online.on" : "settings.online.off")}
             </button>
           </div>
           <button

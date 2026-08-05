@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, it } from "vitest"
+import { afterAll, beforeAll, describe, expect, it } from "vitest"
 import { createClient, type SupabaseClient } from "@supabase/supabase-js"
 import { config } from "dotenv"
 
@@ -13,17 +13,34 @@ async function signedIn(email: string, password: string): Promise<SupabaseClient
   return c
 }
 
-// SHOP_A (corner-grind) is given a fake stripe_account_id by the controller before this
-// suite and reset after. SHOP_B (pilot-test) has no account.
+// SHOP_A (corner-grind) needs a stripe_account_id for the success-path tests below.
+// The suite provisions it itself with the service-role client (bypasses RLS + the
+// billing trigger, since normal clients can't set the protected stripe_account_id
+// column) and resets it in afterAll so no fake account is left on a real shop.
+// SHOP_B (pilot-test) has no account.
 describe("set_online_payments", () => {
   let withAcct: SupabaseClient
   let noAcct: SupabaseClient
   let noShop: SupabaseClient
+  const admin = createClient(url, process.env.SUPABASE_SERVICE_ROLE_KEY!, {
+    auth: { persistSession: false },
+  })
 
   beforeAll(async () => {
     withAcct = await signedIn(process.env.SHOP_A_EMAIL!, process.env.SHOP_A_PASSWORD!)
     noAcct = await signedIn(process.env.SHOP_B_EMAIL!, process.env.SHOP_B_PASSWORD!)
     noShop = await signedIn(process.env.REGISTER_TEST_EMAIL!, process.env.REGISTER_TEST_PASSWORD!)
+    await admin
+      .from("shops")
+      .update({ stripe_account_id: "acct_test_connect", payment_modes: ["in_store"] })
+      .eq("slug", "corner-grind")
+  })
+
+  afterAll(async () => {
+    await admin
+      .from("shops")
+      .update({ stripe_account_id: null, payment_modes: ["in_store"] })
+      .eq("slug", "corner-grind")
   })
 
   it("enable without a connected account is rejected", async () => {

@@ -6,25 +6,31 @@ import { createAdminClient } from "@/lib/supabase/admin"
 
 export const runtime = "nodejs"
 
-function site() {
-  return process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"
+// Internal redirects use request.url as the base (not NEXT_PUBLIC_APP_URL) so this
+// route has no dependency on that env var — only the outbound OAuth flow in
+// start/route.ts needs the canonical app URL.
+const settings = (q: string, request: Request) => {
+  const res = NextResponse.redirect(new URL(`/dashboard/settings?connect=${q}`, request.url))
+  res.cookies.delete("onbd_state") // clear on the response we actually return
+  return res
 }
-const settings = (q: string) =>
-  NextResponse.redirect(new URL(`/dashboard/settings?connect=${q}`, site()))
 
 export async function GET(request: Request) {
   const params = new URL(request.url).searchParams
-  if (params.get("error")) return settings("cancelled") // user declined on Stripe
+  if (params.get("error")) return settings("cancelled", request) // user declined on Stripe
 
   const code = params.get("code")
   const state = params.get("state")
   const jar = await cookies()
   const cookieState = jar.get("onbd_state")?.value
-  jar.delete("onbd_state")
-  if (!code || !state || !cookieState || state !== cookieState) return settings("error")
+  if (!code || !state || !cookieState || state !== cookieState) return settings("error", request)
 
   const shop = await getStaffShop()
-  if (!shop) return NextResponse.redirect(new URL("/dashboard", site()))
+  if (!shop) {
+    const res = NextResponse.redirect(new URL("/dashboard", request.url))
+    res.cookies.delete("onbd_state")
+    return res
+  }
 
   try {
     const token = await getStripe().oauth.token({
@@ -32,11 +38,11 @@ export async function GET(request: Request) {
       code,
     })
     const acct = token.stripe_user_id
-    if (!acct) return settings("error")
+    if (!acct) return settings("error", request)
     const admin = createAdminClient()
     await admin.from("shops").update({ stripe_account_id: acct }).eq("id", shop.id)
   } catch {
-    return settings("error")
+    return settings("error", request)
   }
-  return settings("success")
+  return settings("success", request)
 }

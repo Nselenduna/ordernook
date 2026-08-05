@@ -195,6 +195,8 @@ const dict = {
   "settings.online.connectError": "Couldn't connect Stripe. Please try again.",
   "settings.online.connectCancelled": "Stripe connection cancelled",
   "settings.online.saveFailed": "Couldn't save. Please try again.",
+  "settings.online.on": "On",
+  "settings.online.off": "Off",
 
   // Dashboard nav
   "nav.orders": "Orders",
