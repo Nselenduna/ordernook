@@ -36,6 +36,11 @@ export async function reconcileOrderPayment(
       {},
       { stripeAccount: order.shop_stripe_account_id }
     )
+    // A session id in the URL isn't proof of payment for THIS order — a
+    // customer could reuse a previously-paid session_id for a different
+    // pending_payment order at the same shop. checkout-order/route.ts always
+    // stamps metadata.order_id at session creation, so this must match.
+    if (session.metadata?.order_id !== order.id) return
     if (session.payment_status !== "paid") return
 
     const admin = createAdminClient()

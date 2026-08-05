@@ -24,6 +24,20 @@ export async function POST(request: Request) {
     const orderId = s.metadata?.order_id
     if (orderId && s.payment_status === "paid") {
       const admin = createAdminClient()
+      // Standard Connect: each shop has its own Stripe account, so a
+      // malicious shop could pay a trivial amount on THEIR account with
+      // another shop's order_id in metadata to flip that order to paid.
+      // Confirm the order actually belongs to the account that emitted
+      // this event before writing anything.
+      const { data: ord } = await admin
+        .from("orders")
+        .select("id, shops(stripe_account_id)")
+        .eq("id", orderId)
+        .maybeSingle()
+      const acct = (ord?.shops as { stripe_account_id: string | null } | null)
+        ?.stripe_account_id
+      if (!ord || acct !== event.account) return NextResponse.json({ received: true }) // ignore mismatched/unknown
+
       await admin.from("orders")
         .update({ status: "new", stripe_payment_intent_id: (s.payment_intent as string) ?? null })
         .eq("id", orderId).eq("status", "pending_payment") // idempotent guard

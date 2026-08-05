@@ -80,6 +80,8 @@ const dict = {
   "order.step.ready": "Ready",
   "order.step.collected": "Collected",
   "order.status.new": "Waiting for the shop to accept your order",
+  "order.status.pending_payment":
+    "Waiting for payment — finish checkout to confirm your order.",
   "order.status.accepted": "The shop has accepted your order",
   "order.status.preparing": "Your order is being prepared",
   "order.status.ready": "Your order is ready — go and grab it!",

@@ -15,7 +15,7 @@ import type { OrderStatus, OrderView } from "@/lib/types";
 const POLL_MS = 8000;
 
 const STATUS_MESSAGE: Partial<Record<OrderStatus, I18nKey>> = {
-  pending_payment: "order.status.new",
+  pending_payment: "order.status.pending_payment",
   new: "order.status.new",
   accepted: "order.status.accepted",
   preparing: "order.status.preparing",
