@@ -265,9 +265,16 @@ export function CheckoutSheet({
               {onlineOffered && (
                 <div className="flex flex-col gap-1.5">
                   <Label>{t("cart.payChoice")}</Label>
-                  <div className="flex gap-1 rounded-2xl bg-card/80 p-1 shadow-[0_8px_30px_rgba(111,78,55,.08)] backdrop-blur-md">
+                  <div
+                    role="radiogroup"
+                    aria-label={t("cart.payChoice")}
+                    className="flex gap-1 rounded-2xl bg-card/80 p-1 shadow-[0_8px_30px_rgba(111,78,55,.08)] backdrop-blur-md"
+                  >
                     <button
                       type="button"
+                      role="radio"
+                      aria-checked={payMode === "in_store"}
+                      disabled={submitting || redirecting}
                       onClick={() => setPayMode("in_store")}
                       className={cn(
                         "h-11 flex-1 rounded-xl text-sm font-medium transition-colors",
@@ -280,6 +287,9 @@ export function CheckoutSheet({
                     </button>
                     <button
                       type="button"
+                      role="radio"
+                      aria-checked={payMode === "online"}
+                      disabled={submitting || redirecting}
                       onClick={() => setPayMode("online")}
                       className={cn(
                         "h-11 flex-1 rounded-xl text-sm font-medium transition-colors",
