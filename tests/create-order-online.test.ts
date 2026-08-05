@@ -12,7 +12,9 @@ const guest = () => createClient(url, anon)
 let itemId: string
 
 async function firstItem(): Promise<string> {
-  const { data } = await admin.from("menu_items").select("id").eq("is_available", true).limit(1).single()
+  const { data: shop } = await admin.from("shops").select("id").eq("slug", "corner-grind").single()
+  const { data } = await admin.from("menu_items").select("id")
+    .eq("shop_id", (shop as { id: string }).id).eq("is_available", true).limit(1).single()
   return (data as { id: string }).id
 }
 
