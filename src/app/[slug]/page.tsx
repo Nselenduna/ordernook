@@ -101,6 +101,7 @@ export default async function ShopPage({ params }: Props) {
           name: shop.name,
           slug: shop.slug,
           prep_minutes: shop.prep_minutes,
+          payment_modes: shop.payment_modes,
         }}
         branding={branding}
         categories={categories}

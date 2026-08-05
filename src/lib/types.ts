@@ -31,6 +31,7 @@ export type ShopSummary = {
   name: string
   slug: string
   prep_minutes: number
+  payment_modes: PaymentMode[]
 }
 
 // ---- RPC payloads/results (the RPCs take/return jsonb, so we type them here)

@@ -519,6 +519,7 @@ export type Database = {
           p_customer_name: string
           p_customer_phone: string
           p_items: Json
+          p_payment_mode: string
           p_shop_slug: string
         }
         Returns: Json

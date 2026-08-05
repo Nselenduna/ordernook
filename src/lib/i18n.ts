@@ -41,6 +41,12 @@ const dict = {
   "cart.placeOrder": "Place order — pay at pickup",
   "cart.placing": "Placing your order…",
   "cart.payNote": "You pay at the counter when you collect.",
+  "cart.payChoice": "How would you like to pay?",
+  "cart.payNow": "Pay online now",
+  "cart.payLater": "Pay when I collect",
+  "cart.redirecting": "Redirecting to payment…",
+  "cart.payErrorGeneric":
+    "Something went wrong starting payment. Please try again.",
 
   // Order placement errors (mapped from create_order DB exceptions)
   "errors.nameRequired":
@@ -50,6 +56,16 @@ const dict = {
     "One of your items just sold out. Please remove it and try again.",
   "errors.missing_required_option":
     "One of your items is missing a required choice (like size). Please remove and re-add it.",
+  "errors.payment_mode_unavailable":
+    "Online payment isn't available for this shop right now — please pay at pickup instead.",
+  "errors.online_not_configured":
+    "This shop hasn't finished setting up online payments yet — please pay at pickup instead.",
+  "errors.amount_too_low":
+    "This order total is too small to pay online — please pay at pickup instead.",
+  "errors.no_account":
+    "This shop can't take online payments right now — please pay at pickup instead.",
+  "errors.not_payable":
+    "This order can't be paid online right now. Please check your order status.",
   "errors.generic": "Something went wrong placing your order. Please try again.",
 
   // Customer order status page

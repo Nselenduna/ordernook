@@ -21,7 +21,11 @@ const MUTE_KEY = "oa-dash-muted"
 type TabId = "all" | "new" | "inProgress" | "ready" | "done"
 
 function tabOf(status: OrderStatus): Exclude<TabId, "all"> {
-  if (status === "new" || status === "pending_payment") return "new"
+  // pending_payment orders are filtered out of the dashboard entirely (they're
+  // unpaid — see the fetch/subscription below), but keep this mapping safe in
+  // case one ever slips through: never surface it as if it were a real "new" order.
+  if (status === "pending_payment") return "done"
+  if (status === "new") return "new"
   if (status === "accepted" || status === "preparing") return "inProgress"
   if (status === "ready") return "ready"
   return "done"
@@ -60,6 +64,13 @@ export function DashboardShell({ shop }: { shop: Tables<"shops"> }) {
   const mutedRef = useRef(muted)
   mutedRef.current = muted
 
+  // Tracks which order ids are already in `orders` state, for the realtime
+  // handlers below (which close over stale state otherwise). Needed because
+  // pending_payment orders skip the INSERT event — the first time one of
+  // them reaches state is via an UPDATE, and that handler needs to know it's
+  // "new to us" so it fetches items instead of upserting an empty order.
+  const orderIdsRef = useRef<Set<string>>(new Set())
+
   // Load mute preference after mount (localStorage isn't available in SSR).
   useEffect(() => {
     setMuted(window.localStorage.getItem(MUTE_KEY) === "1")
@@ -79,6 +90,7 @@ export function DashboardShell({ shop }: { shop: Tables<"shops"> }) {
   }, [])
 
   const upsertOrder = useCallback((row: OrderRow, items?: Tables<"order_items">[]) => {
+    orderIdsRef.current.add(row.id)
     setOrders((previous) => {
       const existing = previous.find((order) => order.id === row.id)
       if (existing) {
@@ -114,8 +126,12 @@ export function DashboardShell({ shop }: { shop: Tables<"shops"> }) {
         .select("*, order_items(*)")
         .eq("shop_id", shop.id)
         .gte("placed_at", startOfToday.toISOString())
+        // Unpaid online orders live here until Stripe confirms payment (an
+        // UPDATE flips them to "new") — never show them in the queue.
+        .neq("status", "pending_payment")
         .order("placed_at", { ascending: false })
       if (cancelled) return
+      orderIdsRef.current = new Set((data ?? []).map((order) => order.id))
       setOrders(data ?? [])
       setLoading(false)
 
@@ -139,6 +155,10 @@ export function DashboardShell({ shop }: { shop: Tables<"shops"> }) {
         },
         async (payload) => {
           const row = payload.new as OrderRow
+          // Unpaid online orders insert as pending_payment — don't show or
+          // chime for them yet. They'll arrive again via the UPDATE handler
+          // below once Stripe confirms payment and the row flips to "new".
+          if (row.status === "pending_payment") return
           if (!mutedRef.current) play()
           // The realtime payload has no order_items — fetch the snapshots.
           const items = await fetchItems(row.id)
@@ -153,8 +173,19 @@ export function DashboardShell({ shop }: { shop: Tables<"shops"> }) {
           table: "orders",
           filter: `shop_id=eq.${shop.id}`,
         },
-        (payload) => {
-          if (!cancelled) upsertOrder(payload.new as OrderRow)
+        async (payload) => {
+          const row = payload.new as OrderRow
+          if (cancelled) return
+          if (!orderIdsRef.current.has(row.id)) {
+            // First time we're seeing this order — its INSERT was skipped
+            // while it was pending_payment. Treat this like a fresh order:
+            // chime + fetch its item snapshots (UPDATE payloads carry none).
+            if (!mutedRef.current) play()
+            const items = await fetchItems(row.id)
+            if (!cancelled) upsertOrder(row, items)
+            return
+          }
+          upsertOrder(row)
         }
       )
 
