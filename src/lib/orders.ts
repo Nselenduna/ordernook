@@ -5,6 +5,7 @@ type ReconcilableOrder = {
   id: string
   status: string
   shop_stripe_account_id: string | null
+  total_minor: number
 }
 
 /**
@@ -42,6 +43,13 @@ export async function reconcileOrderPayment(
     // stamps metadata.order_id at session creation, so this must match.
     if (session.metadata?.order_id !== order.id) return
     if (session.payment_status !== "paid") return
+    // Belt-and-braces: the paid amount should exactly match what the order
+    // was created for. A mismatch means something's wrong upstream — don't
+    // flip the order to paid, just log for investigation.
+    if (session.amount_total != null && session.amount_total !== order.total_minor) {
+      console.error("reconcile amount mismatch", { orderId: order.id, sessionAmount: session.amount_total, orderTotal: order.total_minor })
+      return
+    }
 
     const admin = createAdminClient()
     await admin
@@ -52,7 +60,8 @@ export async function reconcileOrderPayment(
       })
       .eq("id", order.id)
       .eq("status", "pending_payment") // idempotent guard vs. the connect webhook
-  } catch {
+  } catch (e) {
     // Swallow: the connect webhook is the reliability backstop for this order.
+    console.error("reconcileOrderPayment failed", { orderId: order.id, e })
   }
 }

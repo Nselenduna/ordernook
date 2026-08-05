@@ -20,7 +20,7 @@ export default async function OrderStatusPage({ params, searchParams }: Props) {
       const admin = createAdminClient();
       const { data: order } = await admin
         .from("orders")
-        .select("id, status, shops(stripe_account_id)")
+        .select("id, status, total_minor, shops(stripe_account_id)")
         .eq("access_token", token)
         .maybeSingle();
       if (order) {
@@ -30,6 +30,7 @@ export default async function OrderStatusPage({ params, searchParams }: Props) {
             id: order.id,
             status: order.status,
             shop_stripe_account_id: shop?.stripe_account_id ?? null,
+            total_minor: order.total_minor,
           },
           session_id
         );

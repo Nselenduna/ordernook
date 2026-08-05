@@ -31,12 +31,25 @@ export async function POST(request: Request) {
       // this event before writing anything.
       const { data: ord } = await admin
         .from("orders")
-        .select("id, shops(stripe_account_id)")
+        .select("id, total_minor, shops(stripe_account_id)")
         .eq("id", orderId)
         .maybeSingle()
       const acct = (ord?.shops as { stripe_account_id: string | null } | null)
         ?.stripe_account_id
-      if (!ord || acct !== event.account) return NextResponse.json({ received: true }) // ignore mismatched/unknown
+      if (!ord || acct !== event.account) {
+        // Either the order doesn't exist, or the event came from a Stripe
+        // account that doesn't own this order (see comment above) — a paid
+        // Checkout session with nowhere to land. Log so it's not silently lost.
+        console.error("connect-webhook account mismatch or order not found", { orderId, eventAccount: event.account })
+        return NextResponse.json({ received: true }) // ignore mismatched/unknown
+      }
+      // Belt-and-braces: the paid amount should exactly match what the order
+      // was created for. A mismatch means something's wrong upstream — don't
+      // flip the order to paid, just log for investigation.
+      if (s.amount_total != null && s.amount_total !== ord.total_minor) {
+        console.error("connect-webhook amount mismatch", { orderId, sessionAmount: s.amount_total, orderTotal: ord.total_minor })
+        return NextResponse.json({ received: true })
+      }
 
       await admin.from("orders")
         .update({ status: "new", stripe_payment_intent_id: (s.payment_intent as string) ?? null })
