@@ -337,9 +337,29 @@ export function DashboardShell({ shop }: { shop: Tables<"shops"> }) {
 
       <RejectDialog
         order={rejectTarget}
-        onConfirm={(order, reason) =>
-          advance(order, "rejected", { reject_reason: reason })
-        }
+        onConfirm={async (order, reason) => {
+          // Reject can require a Stripe refund (paid online orders) — route
+          // through the server so the refund and status flip happen
+          // together. Keep the direct-update `advance` path for
+          // accept/preparing/ready/collected, which never touch money.
+          const res = await fetch("/api/stripe/refund-order", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({ order_id: order.id, reason }),
+          })
+          if (!res.ok) {
+            toast.error(t("dash.updateFailed"))
+            return
+          }
+          const { status } = await res.json()
+          // Reflect the server-decided status (refunded or rejected) in
+          // local state; the realtime UPDATE event confirms it shortly after.
+          setOrders((previous) =>
+            previous.map((o) =>
+              o.id === order.id ? { ...o, status, reject_reason: reason } : o
+            )
+          )
+        }}
         onClose={() => setRejectTarget(null)}
       />
     </div>
