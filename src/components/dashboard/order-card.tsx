@@ -117,7 +117,7 @@ export function OrderCard({
           <Badge variant="secondary">
             {order.payment_mode === "in_store"
               ? t("dash.payAtCounter")
-              : order.currency}
+              : t("dash.paidOnline")}
           </Badge>
           <span className="font-semibold tabular-nums">
             {formatMinor(order.total_minor, order.currency)}

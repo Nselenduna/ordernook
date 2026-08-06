@@ -129,7 +129,10 @@ export function OrderStatusClient({ token }: { token: string }) {
     );
   }
 
-  const rejected = order.status === "rejected" || order.status === "refunded";
+  // "rejected" and "refunded" are both final, no-order-coming outcomes —
+  // they share the same card layout but show different copy.
+  const showFinalCard =
+    order.status === "rejected" || order.status === "refunded";
   const showEta =
     order.status === "new" ||
     order.status === "accepted" ||
@@ -148,12 +151,22 @@ export function OrderStatusClient({ token }: { token: string }) {
           </h1>
         </header>
 
-        {rejected ? (
+        {showFinalCard ? (
           <div className="flex flex-col gap-1 rounded-3xl bg-destructive/10 p-5 text-center">
             <p className="font-heading text-xl font-semibold text-destructive">
-              {t("order.rejected.title")}
+              {t(
+                order.status === "refunded"
+                  ? "order.refunded.title"
+                  : "order.rejected.title"
+              )}
             </p>
-            <p className="text-sm">{t("order.rejected.body")}</p>
+            <p className="text-sm">
+              {t(
+                order.status === "refunded"
+                  ? "order.refunded.body"
+                  : "order.rejected.body"
+              )}
+            </p>
             {order.reject_reason && (
               <p className="text-sm text-muted-foreground">
                 {t("order.rejected.reason", { reason: order.reject_reason })}
@@ -180,9 +193,7 @@ export function OrderStatusClient({ token }: { token: string }) {
           </div>
         )}
 
-        {!rejected && !isFinalStatus(order.status) && (
-          <PushCard token={token} />
-        )}
+        {!isFinalStatus(order.status) && <PushCard token={token} />}
 
         <section className="flex flex-col gap-3 rounded-3xl bg-card p-5 shadow-[0_8px_30px_rgba(111,78,55,.12)] backdrop-blur-md">
           <h2 className="font-heading text-lg font-medium">
