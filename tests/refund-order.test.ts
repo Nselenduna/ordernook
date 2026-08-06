@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { decideRejectOutcome } from "../src/app/api/stripe/refund-order/route"
+import { decideRejectOutcome } from "../src/lib/refund"
 
 describe("decideRejectOutcome", () => {
   it("refunds a paid online order", () => {

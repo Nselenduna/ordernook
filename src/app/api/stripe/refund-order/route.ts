@@ -1,23 +1,10 @@
 import { NextResponse } from "next/server"
 import { getStaffShop } from "@/lib/dashboard"
+import { decideRejectOutcome } from "@/lib/refund"
 import { getStripe } from "@/lib/stripe"
 import { createAdminClient } from "@/lib/supabase/admin"
 
 export const runtime = "nodejs"
-
-/**
- * Pure decision: does rejecting this order require a Stripe refund?
- * Only paid-online orders (payment_mode "online" with a captured payment
- * intent) get refunded; in-store or unpaid orders just flip to "rejected".
- * Extracted so it's testable without a staff session/cookie or Stripe.
- */
-export function decideRejectOutcome(o: {
-  payment_mode: string
-  stripe_payment_intent_id: string | null
-}): { status: "refunded" | "rejected"; refund: boolean } {
-  const refund = o.payment_mode === "online" && !!o.stripe_payment_intent_id
-  return { status: refund ? "refunded" : "rejected", refund }
-}
 
 export async function POST(request: Request) {
   const shop = await getStaffShop()
