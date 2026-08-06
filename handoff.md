@@ -1,4 +1,26 @@
-# handoff.md — OrderNook (session end: 4 Aug 2026)
+# handoff.md — OrderNook (session end: 6 Aug 2026)
+
+## TL;DR — Phase 2B (customer online payments) is BUILT + MERGED, NOT yet deployed
+All three slices are on `master` (subagent-driven, each task reviewed; 63/63 tests):
+- **2B-1** — shop connects Stripe (Standard OAuth) + "Accept online orders" toggle. `set_online_payments`
+  RPC + `enforce_online_requires_account` trigger; `/api/stripe/connect/{start,callback,disconnect}`.
+- **2B-2a** — customer pay-online: `create_order(p_payment_mode)` → `pending_payment` → `/api/stripe/checkout-order`
+  (Checkout Session on the connected account, zero commission) → reconcile-on-return in `/order/[token]`
+  + `/api/stripe/connect-webhook` backup → order flips to `new`.
+- **2B-2b** — auto-refund on reject: `/api/stripe/refund-order` (idempotency key + status-race guard +
+  `protect_order_terminal_status` trigger). "Paid online"/Refunded display.
+- All migrations already applied to the OrderNook DB (single project). Design/plan docs: `phase2b-*.md`.
+
+### ⚠️ DEPLOY GATE for Phase 2B (do before `vercel --prod`)
+1. **Live run-through not yet done** — connect a test shop, pay `4242`, then reject → auto-refund.
+   The automation browser can't complete Stripe's hosted pages, so run it in a real browser.
+2. **Live-mode Stripe config** (test values used in dev won't work in prod):
+   - `STRIPE_CONNECT_CLIENT_ID` = the **live** `ca_…` (Connect → OAuth, live mode) in Vercel prod.
+   - Register `https://ordernook.uk/api/stripe/connect/callback` in **live**-mode Connect redirects.
+   - Create a **Connect webhook** (`checkout.session.completed` on connected accounts) →
+     `STRIPE_CONNECT_WEBHOOK_SECRET` in Vercel prod (reconcile-on-return is primary; this is backup).
+   - Confirm `NEXT_PUBLIC_APP_URL=https://ordernook.uk` in Vercel prod (routes now require it).
+3. Then `vercel --prod --yes` — ships the whole 2B stack together.
 
 ## TL;DR
 **Phase 2A shop subscriptions is COMPLETE and self-healing in production.** The billing
