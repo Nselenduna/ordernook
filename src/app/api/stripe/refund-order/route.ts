@@ -28,6 +28,23 @@ export async function POST(request: Request) {
   if (refund) {
     if (!shop.stripe_account_id)
       return NextResponse.json({ error: "no_account" }, { status: 409 })
+
+    // Re-verify the order is still refundable right before we touch Stripe.
+    // Another device/tab could have flipped the status (e.g. marked
+    // "collected") in the gap between the initial read above and now.
+    const { data: fresh } = await admin
+      .from("orders")
+      .select("status")
+      .eq("id", order.id)
+      .maybeSingle()
+    const freshStatus = (fresh as { status: string } | null)?.status
+    if (
+      !freshStatus ||
+      !["new", "accepted", "preparing", "ready", "pending_payment"].includes(freshStatus)
+    ) {
+      return NextResponse.json({ status: freshStatus ?? order.status })
+    }
+
     try {
       await getStripe().refunds.create(
         { payment_intent: order.stripe_payment_intent_id as string },
@@ -40,8 +57,16 @@ export async function POST(request: Request) {
         }
       )
     } catch (e) {
+      // Stripe already refunded this payment intent (e.g. a prior request
+      // succeeded on Stripe's side but we failed to persist it, or someone
+      // refunded it manually in the Stripe dashboard). The money is already
+      // back with the customer, so treat this as success rather than
+      // surfacing a false failure to staff.
+      const isAlreadyRefunded = (e as { code?: string })?.code === "charge_already_refunded"
       console.error("refund-order refund failed", { orderId: order.id, e })
-      return NextResponse.json({ error: "refund_failed" }, { status: 502 })
+      if (!isAlreadyRefunded) {
+        return NextResponse.json({ error: "refund_failed" }, { status: 502 })
+      }
     }
   }
 
