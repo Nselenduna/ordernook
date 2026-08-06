@@ -22,10 +22,11 @@ function RejectForm({
   onClose,
 }: {
   order: DashboardOrder
-  onConfirm: (order: DashboardOrder, reason: string) => void
+  onConfirm: (order: DashboardOrder, reason: string) => void | Promise<void>
   onClose: () => void
 }) {
   const [reason, setReason] = useState("")
+  const [submitting, setSubmitting] = useState(false)
 
   return (
     <>
@@ -56,9 +57,18 @@ function RejectForm({
         <Button
           variant="destructive"
           className="h-11 rounded-full"
-          onClick={() => {
-            onConfirm(order, reason.trim())
-            onClose()
+          disabled={submitting}
+          onClick={async () => {
+            // Guard against a double-click firing two refund requests
+            // before the first one's response comes back.
+            if (submitting) return
+            setSubmitting(true)
+            try {
+              await onConfirm(order, reason.trim())
+            } finally {
+              setSubmitting(false)
+              onClose()
+            }
           }}
         >
           {t("dash.reject.confirm")}
@@ -74,7 +84,7 @@ export function RejectDialog({
   onClose,
 }: {
   order: DashboardOrder | null
-  onConfirm: (order: DashboardOrder, reason: string) => void
+  onConfirm: (order: DashboardOrder, reason: string) => void | Promise<void>
   onClose: () => void
 }) {
   return (
