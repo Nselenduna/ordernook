@@ -1,99 +1,63 @@
 # handoff.md — OrderNook (session end: 6 Aug 2026)
 
-## TL;DR — Phase 2B (customer online payments) is BUILT + MERGED, NOT yet deployed
-All three slices are on `master` (subagent-driven, each task reviewed; 63/63 tests):
-- **2B-1** — shop connects Stripe (Standard OAuth) + "Accept online orders" toggle. `set_online_payments`
-  RPC + `enforce_online_requires_account` trigger; `/api/stripe/connect/{start,callback,disconnect}`.
-- **2B-2a** — customer pay-online: `create_order(p_payment_mode)` → `pending_payment` → `/api/stripe/checkout-order`
-  (Checkout Session on the connected account, zero commission) → reconcile-on-return in `/order/[token]`
-  + `/api/stripe/connect-webhook` backup → order flips to `new`.
-- **2B-2b** — auto-refund on reject: `/api/stripe/refund-order` (idempotency key + status-race guard +
-  `protect_order_terminal_status` trigger). "Paid online"/Refunded display.
-- All migrations already applied to the OrderNook DB (single project). Design/plan docs: `phase2b-*.md`.
+## TL;DR — where we are
+- **Phase 2A subscriptions** — LIVE in production, self-healing (reconcile-on-return + live Stripe webhook).
+- **Slice 4 self-serve registration** — SHIPPED & LIVE at `ordernook.uk/dashboard/register`.
+- **Phase 2B customer online payments** — fully BUILT, reviewed, and MERGED to `master`; **NOT deployed** (held so the whole stack ships together after one live run-through + live-mode Stripe config).
 
-### ⚠️ DEPLOY GATE for Phase 2B (do before `vercel --prod`)
-1. **Live run-through not yet done** — connect a test shop, pay `4242`, then reject → auto-refund.
-   The automation browser can't complete Stripe's hosted pages, so run it in a real browser.
-2. **Live-mode Stripe config** (test values used in dev won't work in prod):
-   - `STRIPE_CONNECT_CLIENT_ID` = the **live** `ca_…` (Connect → OAuth, live mode) in Vercel prod.
-   - Register `https://ordernook.uk/api/stripe/connect/callback` in **live**-mode Connect redirects.
-   - Create a **Connect webhook** (`checkout.session.completed` on connected accounts) →
-     `STRIPE_CONNECT_WEBHOOK_SECRET` in Vercel prod (reconcile-on-return is primary; this is backup).
-   - Confirm `NEXT_PUBLIC_APP_URL=https://ordernook.uk` in Vercel prod (routes now require it).
-3. Then `vercel --prod --yes` — ships the whole 2B stack together.
+## ▶ IMMEDIATE NEXT ACTION — ship Phase 2B
+Do these three, then `vercel --prod --yes` (ships the whole online-payments stack):
 
-## TL;DR
-**Phase 2A shop subscriptions is COMPLETE and self-healing in production.** The billing
-loop now has two independent paths that both write subscription state to the DB:
-1. **On-return reconciliation** (covers the subscribe moment) — verified test-mode.
-2. **Live Stripe webhook** (covers lifecycle: renewals, cancels, failed payments) — verified live.
+**1. One live run-through** (real browser — the automation browser can't complete Stripe's hosted pages):
+- A shop → Settings → **Connect Stripe** (test mode) → complete the test connection.
+- Place an order → **Pay online now** → pay with test card `4242 4242 4242 4242` → order lands in the shop's dashboard as paid.
+- **Reject** that paid order → Stripe shows a full refund + order reads "Refunded".
 
-**Slice 4 — Self-serve registration is SHIPPED and LIVE** (deployed 4 Aug 2026 → ordernook.uk).
-Owner signup at `/dashboard/register` (name+email+password → `register_shop` SECURITY DEFINER RPC
-→ shop on a 30-day trial → dashboard). Built via subagent-driven TDD; 50/50 tests pass; whole-branch
-review ship-ready. RPC migration `20260804140000_register_shop.sql` applied to the OrderNook DB.
-Verified end-to-end in browser: full signUp happy path (auth user auto-confirmed + shop created,
-trialing/GB/30d/owner) AND recovery-mode path; slug UX (available/taken/reserved/too-short) live;
-prod page renders at ordernook.uk/dashboard/register.
-**Supabase Auth "Confirm email" is now OFF** (`mailer_autoconfirm=true`) — required for the instant-
-access design. Docs: [phase1-slice4-self-serve-registration.md](phase1-slice4-self-serve-registration.md)
-(spec) + `-plan.md` (implementation plan).
+**2. Live-mode Stripe config** (dev used TEST values; they won't work in prod):
+- `STRIPE_CONNECT_CLIENT_ID` = the **live** `ca_…` (OrderNook Stripe → Connect → OAuth, **live** mode) → set in Vercel prod.
+  (Test client id used in dev: `ca_V0Srb6UlU42OKo9QbRuYVKzoOqqVZ8RO` — DO NOT use in prod.)
+- Register `https://ordernook.uk/api/stripe/connect/callback` in **live**-mode Connect redirects.
+- Create a **Connect webhook** (event `checkout.session.completed` on connected accounts) → `STRIPE_CONNECT_WEBHOOK_SECRET` in Vercel prod. (Reconcile-on-return is primary; webhook is the backup.)
+- Confirm `NEXT_PUBLIC_APP_URL=https://ordernook.uk` in Vercel prod (routes now require it).
 
-Optional follow-up: consider disabling email-enumeration protection so a duplicate-email signup shows
-"already registered" rather than the confirm-email message (minor UX papercut, non-blocking).
+**3. Deploy:** `vercel --prod --yes`. Migrations are already in the DB (single project), so this ships the frontend.
 
-## Run it
-```
-cd "C:\Users\lloyd\OneDrive\Desktop\Projexts 2025\OrderNook\order-ahead"
-npm run dev
-```
-- Live: https://ordernook.uk · deploy: `vercel --prod --yes`
-- Supabase: iryavyogljedwgllaoit (Zizwe org, Pro) · Repo: Nselenduna/ordernook
+## Project
+`C:\Users\lloyd\OneDrive\Desktop\Projexts 2025\OrderNook\order-ahead`
+- Repo Nselenduna/ordernook · Live ordernook.uk (Vercel `order-ahead`) · deploy `vercel --prod --yes`
+- Supabase **iryavyogljedwgllaoit** (Zizwe org, Pro) — single project = prod; migrations applied via MCP during dev.
+- **Dedicated OrderNook Stripe account `acct_1U0RkqDeO3cMpMIL`** (separate account per app — Lloyd's rule).
+- Design: Travo Purple (dashboard) + Latte Glass (customer). Sentry project `ordernook`.
 
-## What shipped this session (verified)
-1. **Reconcile-on-return fix** (`src/lib/billing.ts` `reconcileFromCheckoutSession`,
-   `checkout/route.ts` success_url `?session_id=...`, `settings/page.tsx` awaits reconcile
-   before `getStaffShop`). Verified end-to-end in **test mode** on pilot-test: Subscribe →
-   test card 4242 → returned to settings → DB flipped trialing→active with correct Stripe IDs,
-   no webhook. UI showed Active + Manage billing. Committed `52277bb`, deployed to prod.
-2. **Live Stripe webhook created + verified.** Endpoint `we_1U0hYpDeO3cMpMIL12QGia8N`,
-   URL https://ordernook.uk/api/stripe/webhook, **Active**, scope **Your account**, 5 events:
-   checkout.session.completed, customer.subscription.created/updated/deleted, invoice.payment_failed.
-   Prod `STRIPE_WEBHOOK_SECRET` set + redeployed; verified: unsigned POST returns
-   `{"error":"bad_signature"}` (secret loaded) and the whsec_ values match Stripe↔Vercel.
+## What's LIVE in production
+- **Phase 2A subscriptions** — Basic £12/mo, 30-day trial → hard lock. Reconcile (`src/lib/billing.ts`) + live webhook (`/api/stripe/webhook`, endpoint `we_1U0hYp…`, 5 events). Confirm-email is OFF (required for instant registration).
+- **Slice 4 registration** — `/dashboard/register` → `register_shop` RPC → shop on a 30-day trial. Auth proxy (`src/proxy.ts`) exempts `/dashboard/register` + `/dashboard/login`.
 
-## Stripe facts (OrderNook — dedicated account, separate per app)
-- **Live account: `acct_1U0RkqDeO3cMpMIL`** (matches live price/customer IDs).
-- Stripe CLI paired as project **`ordernook`** (`stripe login --project-name ordernook`).
-  Its restricted key (`rk_live_...`) can **READ** webhooks but **CANNOT create** them — that's why
-  the create had to be done in the Dashboard, not the CLI.
-- Test price `price_1U0S78DeO3cMpMILVcyVZay5` · Live price `price_1U0S9UDeO3cMpMILOCL8ibiY`
-- Webhook handler: `src/app/api/stripe/webhook/route.ts` (classic constructEvent + admin client).
+## Phase 2B detail (built, merged, NOT deployed)
+- **2B-1 onboarding** — `/api/stripe/connect/{start,callback,disconnect}` (Standard OAuth, CSRF state cookie, account stored via admin client). `set_online_payments` RPC + `enforce_online_requires_account` trigger gate the "Accept online orders" toggle. Settings "Online payments" card.
+- **2B-2a pay-online** — `create_order(p_payment_mode)` → online = `pending_payment` (hidden from shop). `/api/stripe/checkout-order` = Checkout Session ON the connected account (direct charge, **zero commission**, no application_fee). Reconcile-on-return in `/order/[token]` (now a server page + `order-status-client.tsx`) + `/api/stripe/connect-webhook` backup flip → `new`. Customer picks pay-now / pay-on-collection.
+- **2B-2b auto-refund** — `/api/stripe/refund-order` (staff-authed): rejecting a PAID online order → full refund on the connected account (idempotency key `refund-<id>`, status re-verify + affected-row guard) → status `refunded`; else `rejected`. `protect_order_terminal_status` trigger blocks direct client refunded/rejected writes. Auto-refund is ONLY shop-reject-of-paid; returns/disputes/goodwill = shop's own Stripe.
+- Docs: `phase2b-connect-onboarding.md`, `phase2b-customer-payments.md`, `phase2b2a-*-plan.md`, `phase2b2b-*-plan.md`.
 
-## Known items / next actions
-1. ~~corner-grind £12 live sub~~ **RESOLVED 4 Aug:** cancelled + refunded in Dashboard; the live
-   webhook auto-wrote `canceled` (end-to-end proof), then row restored to trialing/2027-01-01,
-   stripe_subscription_id cleared, customer cus_V0eZB5... kept. corner-grind usable as demo shop again.
-2. **Cleanup (low priority):** a leftover **TEST-mode** webhook endpoint
-   `we_1U0SmGDeO3cMpMIL8aiMP9kI` points at the prod URL → 400s on any test activity (harmless,
-   just noise). Delete in Dashboard test mode → Webhooks → ⋯ → Delete.
-3. pilot-test is restored to trial demo state (trialing, 2027-01-01, no Stripe IDs).
-   Creds: owner@pilot-test.test / PilotTest-Demo1!
-4. **Flagged follow-ups:** (a) make the DASHBOARD installable as a PWA (only customer /[slug]
-   installs today); (b) **Slice 4 self-serve business registration** — no "create account" flow exists.
-5. **Phase 2B:** customer online payments (Stripe Connect Standard; reuse BookOnTheMap scaffolding).
+## Key migrations (all applied to the DB)
+`20260802010000_shop_subscriptions` · `20260802020000_protect_billing_columns` · `20260804140000_register_shop` · `20260804160000_set_online_payments` · `20260805120000_create_order_payment_mode` · `20260806120000_protect_order_terminal_status`.
 
-## Architecture (billing)
-- `entitlement.ts` isEntitled(shop): active OR (trialing AND trial_ends_at future).
-- `dashboard/layout.tsx`: LockScreen if shop && !isEntitled (getStaffShopOrNull, non-redirecting).
-- `[slug]/page.tsx`: paused if is_paused || !isEntitled.
-- Migrations: `20260802010000_shop_subscriptions.sql` (is_entitled(), create_order gated),
-  `20260802020000_protect_billing_columns.sql` (protect_shop_billing trigger blocks authenticated/anon
-  writes to billing cols → must use admin/service-role client for stripe_customer_id etc.).
+## Test accounts / fixtures (.env.test, gitignored)
+- SHOP_A = corner-grind `owner@cornergrind.test` / `OrderNook-CG-r7Qx-2607` (has orders/menu; tests self-provision + clear its stripe_account_id/payment_modes).
+- SHOP_B = pilot-test `owner@pilot-test.test` / `PilotTest-Demo1!` (no account).
+- REGISTER_TEST = `register-test@ordernook.test` (no shop — keep shopless for guard tests). `SUPABASE_SERVICE_ROLE_KEY` in .env.test lets tests self-provision.
+- corner-grind + pilot-test have a hand-set `trial_ends_at=2027-01-01` (demo convenience — that's why they show ~150 days; REAL new shops get exactly 30 days).
+- `signUp` rejects `.test` emails (use a real domain for signup E2E; SQL-seeded users bypass it).
 
-## Gotchas (also in CLAUDE.md/memory)
-- supabase-js storage.upload: pass `new Blob([new Uint8Array(buf)], {type})` NOT a raw Node Buffer —
-  undici on Vercel corrupts binary (broken images). Doesn't repro locally.
+## Gotchas
+- **`vitest` runs files serially** (`fileParallelism:false`) — integration tests share one live Supabase + mutate shared shop fixtures; parallel races/flakes. Occasional cross-file flake is transient (re-run).
+- `stripe login` restricted key can READ webhooks but NOT create them → create webhooks in the Dashboard.
+- `vercel env pull` returns EMPTY for sensitive vars — set prod secrets in the Vercel dashboard/CLI + redeploy.
+- supabase-js storage.upload: pass a `Blob`, not a Node Buffer (undici on Vercel corrupts binary).
 - PWA dev: after dev restart, unregister SW + clear caches or stale chunks persist.
-- `vercel env pull` returns EMPTY values for sensitive-flagged vars (STRIPE_*, SUPABASE_*, etc.) —
-  can't retrieve prod secrets this way; set them in the Vercel dashboard/CLI directly.
+
+## Open follow-ups
+- **Deploy Phase 2B** (the immediate next action above).
+- Non-blocking hardening deferred during 2B review (see the phase docs / git): Sentry logging on Stripe routes; a Connect-webhook integration test; refund-route race integration test; cosmetic stepper/`?connect=` URL cleanup.
+- Flagged earlier: make the DASHBOARD installable as a PWA (only customer `/[slug]` installs today).
+- **Phase 2B billing-model note:** online payments are zero-commission (shops keep 100%); OrderNook monetizes via the £12/mo subscription only.
