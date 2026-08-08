@@ -18,7 +18,9 @@ export default async function ProfilePage() {
         shopId={shop.id}
         initialName={shop.name}
         initialTagline={branding.tagline ?? ""}
-        initialColour={branding.primary ?? DEFAULT_BRANDING.primary}
+        initialPrimary={branding.primary ?? DEFAULT_BRANDING.primary}
+        initialAccent={branding.accent ?? DEFAULT_BRANDING.accent}
+        initialBackground={branding.background ?? DEFAULT_BRANDING.background}
         initialLogoUrl={branding.logo_url ?? null}
       />
     </div>

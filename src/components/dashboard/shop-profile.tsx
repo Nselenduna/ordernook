@@ -7,48 +7,49 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { t } from "@/lib/i18n"
 import { createClient } from "@/lib/supabase/client"
-
-/** WCAG contrast ratio of a hex colour against white (button text is white). */
-function contrastVsWhite(hex: string): number {
-  const c = hex.replace("#", "")
-  if (!/^[0-9a-fA-F]{6}$/.test(c)) return 0
-  const chan = [0, 2, 4].map((i) => {
-    const v = parseInt(c.slice(i, i + 2), 16) / 255
-    return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4)
-  })
-  const L = 0.2126 * chan[0] + 0.7152 * chan[1] + 0.0722 * chan[2]
-  return 1.05 / (L + 0.05) // white luminance = 1.0
-}
+import {
+  PRESETS,
+  brandingVars,
+  contrastVsWhite,
+  contrastRatio,
+  derivedForeground,
+} from "@/lib/branding"
 
 export function ShopProfile({
   shopId,
   initialName,
   initialTagline,
-  initialColour,
+  initialPrimary,
+  initialAccent,
+  initialBackground,
   initialLogoUrl,
 }: {
   shopId: string
   initialName: string
   initialTagline: string
-  initialColour: string
+  initialPrimary: string
+  initialAccent: string
+  initialBackground: string
   initialLogoUrl: string | null
 }) {
   const supabase = createClient()
   const [name, setName] = useState(initialName)
   const [tagline, setTagline] = useState(initialTagline)
-  const [colour, setColour] = useState(initialColour)
+  const [primary, setPrimary] = useState(initialPrimary)
+  const [accent, setAccent] = useState(initialAccent)
+  const [background, setBackground] = useState(initialBackground)
   const [logoUrl, setLogoUrl] = useState(initialLogoUrl)
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
 
-  const contrastOk = contrastVsWhite(colour) >= 4.5
+  const primaryOk = contrastVsWhite(primary) >= 4.5
+  const bgOk = contrastRatio(derivedForeground(primary), background) >= 4.5
+  const paletteOk = primaryOk && bgOk
 
   const save = async () => {
     if (!name.trim()) return
-    if (!contrastOk) {
-      toast.error(t("profile.contrastWarning"))
-      return
-    }
+    if (!primaryOk) return void toast.error(t("profile.contrastWarning"))
+    if (!bgOk) return void toast.error(t("profile.bgContrastWarning"))
     setSaving(true)
     // Read-merge-write so we don't clobber logo_url the route set.
     const { data: shop } = await supabase
@@ -61,7 +62,7 @@ export function ShopProfile({
       .from("shops")
       .update({
         name: name.trim(),
-        branding: { ...current, tagline: tagline.trim(), primary: colour, accent: colour },
+        branding: { ...current, tagline: tagline.trim(), primary, accent, background },
       })
       .eq("id", shopId)
     setSaving(false)
@@ -87,9 +88,11 @@ export function ShopProfile({
       return
     }
     const { logo_url } = (await res.json()) as { logo_url: string }
-    setLogoUrl(`${logo_url}?t=${Date.now()}`) // bust <img> cache after re-upload
+    setLogoUrl(`${logo_url}?t=${Date.now()}`)
     toast.success(t("profile.saved"))
   }
+
+  const previewVars = brandingVars({ primary, accent, background })
 
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-4 px-4 py-4">
@@ -113,34 +116,79 @@ export function ShopProfile({
             className="h-11 rounded-xl"
           />
         </div>
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="shop-colour">{t("profile.brandColour")}</Label>
-          <div className="flex items-center gap-3">
-            <input
-              id="shop-colour"
-              type="color"
-              value={colour}
-              onChange={(e) => setColour(e.target.value)}
-              className="h-11 w-16 cursor-pointer rounded-xl border border-input bg-transparent"
-            />
-            <span className="text-sm tabular-nums text-muted-foreground">
-              {colour}
+      </section>
+
+      <section className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-4">
+        <div>
+          <h2 className="font-semibold">{t("profile.palette")}</h2>
+          <p className="text-sm text-muted-foreground">{t("profile.paletteHint")}</p>
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+          {PRESETS.map((p) => (
+            <button
+              key={p.id}
+              type="button"
+              aria-label={p.label}
+              onClick={() => {
+                setPrimary(p.primary)
+                setAccent(p.accent)
+                setBackground(p.background)
+              }}
+              className="flex items-center gap-2 rounded-xl border border-border px-3 py-2 text-sm"
+            >
+              <span className="flex overflow-hidden rounded-full border border-border">
+                <span className="size-4" style={{ background: p.primary }} />
+                <span className="size-4" style={{ background: p.accent }} />
+                <span className="size-4" style={{ background: p.background }} />
+              </span>
+              {p.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-3 gap-3">
+          <ColourField id="c-primary" label={t("profile.primary")} value={primary} onChange={setPrimary} />
+          <ColourField id="c-accent" label={t("profile.accent")} value={accent} onChange={setAccent} />
+          <ColourField id="c-bg" label={t("profile.background")} value={background} onChange={setBackground} />
+        </div>
+
+        {!primaryOk ? (
+          <p className="text-xs text-destructive">{t("profile.contrastWarning")}</p>
+        ) : !bgOk ? (
+          <p className="text-xs text-destructive">{t("profile.bgContrastWarning")}</p>
+        ) : null}
+
+        <div
+          className="theme-latte rounded-xl border border-border p-3"
+          style={{ ...previewVars, background: "var(--background)", color: "var(--foreground)" }}
+        >
+          <p className="mb-2 text-xs" style={{ color: "var(--muted-foreground)" }}>
+            {t("profile.preview")}
+          </p>
+          <div
+            className="flex items-center justify-between rounded-lg p-3"
+            style={{ background: "var(--card)", color: "var(--card-foreground)" }}
+          >
+            <div>
+              <div className="font-medium">Flat White</div>
+              <div className="text-sm" style={{ color: "var(--muted-foreground)" }}>
+                £3.20
+              </div>
+            </div>
+            <span
+              className="rounded-full px-4 py-2 text-sm font-medium"
+              style={{ background: "var(--primary)", color: "var(--primary-foreground)" }}
+            >
+              Add
             </span>
           </div>
-          {!contrastOk ? (
-            <p className="text-xs text-destructive">
-              {t("profile.contrastWarning")}
-            </p>
-          ) : (
-            <p className="text-xs text-muted-foreground">
-              {t("profile.brandColourHint")}
-            </p>
-          )}
         </div>
+
         <Button
           type="button"
           className="h-11 w-fit rounded-full px-6"
-          disabled={saving || !contrastOk || !name.trim()}
+          disabled={saving || !paletteOk || !name.trim()}
           onClick={save}
         >
           {t("profile.save")}
@@ -170,5 +218,33 @@ export function ShopProfile({
         </label>
       </section>
     </main>
+  )
+}
+
+function ColourField({
+  id,
+  label,
+  value,
+  onChange,
+}: {
+  id: string
+  label: string
+  value: string
+  onChange: (v: string) => void
+}) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <Label htmlFor={id}>{label}</Label>
+      <div className="flex items-center gap-2">
+        <input
+          id={id}
+          type="color"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="h-11 w-12 shrink-0 cursor-pointer rounded-xl border border-input bg-transparent"
+        />
+        <span className="text-xs tabular-nums text-muted-foreground">{value}</span>
+      </div>
+    </div>
   )
 }
