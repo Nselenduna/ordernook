@@ -425,6 +425,7 @@ export type Database = {
           prep_minutes: number
           slug: string
           stripe_account_id: string | null
+          stripe_charges_enabled: boolean
           stripe_customer_id: string | null
           stripe_subscription_id: string | null
           subscription_status: string
@@ -443,6 +444,7 @@ export type Database = {
           prep_minutes?: number
           slug: string
           stripe_account_id?: string | null
+          stripe_charges_enabled?: boolean
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           subscription_status?: string
@@ -461,6 +463,7 @@ export type Database = {
           prep_minutes?: number
           slug?: string
           stripe_account_id?: string | null
+          stripe_charges_enabled?: boolean
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           subscription_status?: string
