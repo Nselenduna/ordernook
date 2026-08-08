@@ -47,11 +47,17 @@ export async function GET() {
     if (!acct) {
       const created = await stripe.accounts.create({ type: "standard", country: "GB" })
       acct = created.id
+      // A brand-new account can't charge yet — strip "online" from payment_modes
+      // so customers aren't offered online pay before onboarding completes.
+      const modes = (shop.payment_modes ?? []).filter((m) => m !== "online")
       const { error: updErr } = await admin
         .from("shops")
-        .update({ stripe_account_id: acct, stripe_charges_enabled: false })
+        .update({ stripe_account_id: acct, stripe_charges_enabled: false, payment_modes: modes })
         .eq("id", shop.id)
-      if (updErr) throw new Error("persist_account_failed")
+      if (updErr) {
+        console.error("connect/start: created account but failed to persist", { acct, shopId: shop.id, updErr })
+        throw new Error("persist_account_failed")
+      }
     }
 
     const link = await stripe.accountLinks.create({

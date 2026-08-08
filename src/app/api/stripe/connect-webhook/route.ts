@@ -61,6 +61,7 @@ export async function POST(request: Request) {
 
   if (event.type === "account.updated") {
     const acct = event.data.object as Stripe.Account
+    if (acct.id !== event.account) return NextResponse.json({ received: true })
     const admin = createAdminClient()
     const { data: shop } = await admin
       .from("shops")
