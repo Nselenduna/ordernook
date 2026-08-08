@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import Stripe from "stripe"
 import { getStaffShop } from "@/lib/dashboard"
 import { getStripe } from "@/lib/stripe"
 import { createAdminClient } from "@/lib/supabase/admin"
@@ -30,17 +31,27 @@ export async function GET() {
     if (acct) {
       try {
         await stripe.accounts.retrieve(acct)
-      } catch {
-        acct = null
+      } catch (e) {
+        // Only auto-heal when the stored id is fundamentally unusable for this
+        // key (no such account, or a test account under the live key) — those are
+        // StripeInvalidRequestError. Let transient errors (network, rate limit,
+        // 5xx) propagate to the outer catch so we never orphan a live, charging
+        // account by silently replacing it.
+        if (e instanceof Stripe.errors.StripeInvalidRequestError) {
+          acct = null
+        } else {
+          throw e
+        }
       }
     }
     if (!acct) {
       const created = await stripe.accounts.create({ type: "standard", country: "GB" })
       acct = created.id
-      await admin
+      const { error: updErr } = await admin
         .from("shops")
         .update({ stripe_account_id: acct, stripe_charges_enabled: false })
         .eq("id", shop.id)
+      if (updErr) throw new Error("persist_account_failed")
     }
 
     const link = await stripe.accountLinks.create({
