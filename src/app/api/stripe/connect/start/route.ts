@@ -3,6 +3,7 @@ import Stripe from "stripe"
 import { getStaffShop } from "@/lib/dashboard"
 import { getStripe } from "@/lib/stripe"
 import { createAdminClient } from "@/lib/supabase/admin"
+import { createClient } from "@/lib/supabase/server"
 
 export const runtime = "nodejs"
 
@@ -45,7 +46,24 @@ export async function GET() {
       }
     }
     if (!acct) {
-      const created = await stripe.accounts.create({ type: "standard", country: "GB" })
+      // Prefill what we already know so the café types less during Stripe
+      // onboarding: their email (from the session), business name, public
+      // ordering page as the business URL, and a café/restaurant category.
+      // All are editable in Stripe's flow — this just pre-populates.
+      const supabase = await createClient()
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+      const created = await stripe.accounts.create({
+        type: "standard",
+        country: "GB",
+        email: user?.email ?? undefined,
+        business_profile: {
+          name: shop.name,
+          url: `${site()}/${shop.slug}`,
+          mcc: "5812", // Eating places & restaurants — sensible café default
+        },
+      })
       acct = created.id
       // A brand-new account can't charge yet — strip "online" from payment_modes
       // so customers aren't offered online pay before onboarding completes.
