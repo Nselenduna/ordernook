@@ -62,6 +62,8 @@ export async function GET() {
           name: shop.name,
           url: `${site()}/${shop.slug}`,
           mcc: "5812", // Eating places & restaurants — sensible café default
+          product_description: `Food and drink ordered ahead for collection at ${shop.name}.`,
+          support_email: user?.email ?? undefined,
         },
       })
       acct = created.id
