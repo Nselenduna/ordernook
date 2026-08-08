@@ -5,12 +5,13 @@ import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 import { t } from "@/lib/i18n"
 import { createClient } from "@/lib/supabase/client"
+import type { ConnectState } from "@/lib/connect"
 
 export function OnlinePaymentsCard({
-  connected,
+  state,
   onlineEnabled,
 }: {
-  connected: boolean
+  state: ConnectState
   onlineEnabled: boolean
 }) {
   const supabase = createClient()
@@ -50,17 +51,27 @@ export function OnlinePaymentsCard({
         <p className="text-sm text-muted-foreground">{t("settings.online.blurb")}</p>
       </div>
 
-      {!connected ? (
+      {state === "none" ? (
         <a
           href="/api/stripe/connect/start"
           className="inline-flex h-11 items-center justify-center rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground"
         >
-          {t("settings.online.connect")}
+          {t("settings.online.setup")}
         </a>
+      ) : state === "pending" ? (
+        <div className="flex flex-col gap-3">
+          <span className="text-sm text-muted-foreground">{t("settings.online.pending")}</span>
+          <a
+            href="/api/stripe/connect/start"
+            className="inline-flex h-11 w-fit items-center justify-center rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground"
+          >
+            {t("settings.online.finishSetup")}
+          </a>
+        </div>
       ) : (
         <div className="flex flex-col gap-3">
           <span className="text-sm font-medium text-(--status-ready)">
-            {t("settings.online.connected")}
+            {t("settings.online.ready")}
           </span>
           <div className="flex items-center justify-between">
             <span id="accept-online-label" className="text-sm">

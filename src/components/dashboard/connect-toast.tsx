@@ -9,6 +9,7 @@ export function ConnectToast({ status }: { status?: string }) {
     if (done.current || !status) return
     done.current = true
     if (status === "success") toast.success(t("settings.online.connectSuccess"))
+    else if (status === "pending") toast(t("settings.online.connectPending"))
     else if (status === "cancelled") toast(t("settings.online.connectCancelled"))
     else if (status === "error") toast.error(t("settings.online.connectError"))
   }, [status])

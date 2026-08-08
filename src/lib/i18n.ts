@@ -208,6 +208,11 @@ const dict = {
   "settings.online.blurb":
     "Let customers pay by card when they order — money goes straight to your Stripe, zero commission.",
   "settings.online.connect": "Connect Stripe",
+  "settings.online.setup": "Set up payments",
+  "settings.online.finishSetup": "Finish setup",
+  "settings.online.pending": "Verification pending — finish setup in Stripe to accept payments.",
+  "settings.online.ready": "Ready to accept payments ✓",
+  "settings.online.connectPending": "Almost there — finish verification in Stripe to accept payments.",
   "settings.online.connected": "Connected ✓",
   "settings.online.accept": "Accept online orders",
   "settings.online.disconnect": "Disconnect",
