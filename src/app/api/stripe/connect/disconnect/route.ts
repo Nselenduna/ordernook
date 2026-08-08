@@ -12,7 +12,7 @@ export async function POST() {
   const modes = (shop.payment_modes ?? []).filter((m) => m !== "online")
   await admin
     .from("shops")
-    .update({ stripe_account_id: null, payment_modes: modes })
+    .update({ stripe_account_id: null, stripe_charges_enabled: false, payment_modes: modes })
     .eq("id", shop.id)
   return NextResponse.json({ ok: true })
 }
