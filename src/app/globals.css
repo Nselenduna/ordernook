@@ -134,7 +134,7 @@
 
   --background: var(--brand-bg);
   --foreground: color-mix(in srgb, var(--brand-primary) 35%, #1a1a1a);
-  --card: color-mix(in srgb, var(--brand-bg), white 30%);
+  --card: color-mix(in srgb, color-mix(in srgb, var(--brand-bg), white 30%), transparent 18%);
   --card-foreground: var(--foreground);
   --popover: color-mix(in srgb, var(--brand-bg), white 45%);
   --popover-foreground: var(--foreground);

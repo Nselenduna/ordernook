@@ -2,7 +2,7 @@ import { cache } from "react";
 import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 import { MenuPage } from "@/components/shop/menu-page";
-import { brandingVars, parseBranding } from "@/lib/branding";
+import { DEFAULT_BRANDING, brandingVars, parseBranding } from "@/lib/branding";
 import { isEntitled } from "@/lib/entitlement";
 import { t } from "@/lib/i18n";
 import { createClient } from "@/lib/supabase/server";
@@ -42,7 +42,7 @@ export async function generateViewport({ params }: Props): Promise<Viewport> {
   const { slug } = await params;
   const shop = await getShopWithMenu(slug);
   const branding = shop ? parseBranding(shop.branding) : {};
-  return { themeColor: branding.primary ?? branding.accent ?? "#6F4E37" };
+  return { themeColor: branding.primary ?? branding.accent ?? DEFAULT_BRANDING.primary };
 }
 
 /** Nested Supabase selects come back unordered — sort every level once here. */

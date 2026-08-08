@@ -70,7 +70,7 @@ export function contrastVsWhite(hex: string): number {
   return contrastRatio(`#${c}`, "#ffffff")
 }
 
-/** Linear sRGB mix of two hex colours; `weight` is the share of `a` (0–1). */
+/** sRGB (gamma-space) channel mix — matches CSS color-mix(in srgb, …); weight is the share of `a` (0–1). Keep gamma-space to stay in parity with derivedForeground's CSS. */
 export function mixSrgb(a: string, b: string, weight: number): string {
   const ca = channels(a)
   const cb = channels(b)
