@@ -133,24 +133,24 @@
   --brand-bg: #f6ebdf;
 
   --background: var(--brand-bg);
-  --foreground: #4a3728;
-  --card: rgb(251 244 234 / 0.8); /* frosted glass panel */
-  --card-foreground: #4a3728;
-  --popover: #fbf4ea;
-  --popover-foreground: #4a3728;
+  --foreground: color-mix(in srgb, var(--brand-primary) 35%, #1a1a1a);
+  --card: color-mix(in srgb, var(--brand-bg), white 30%);
+  --card-foreground: var(--foreground);
+  --popover: color-mix(in srgb, var(--brand-bg), white 45%);
+  --popover-foreground: var(--foreground);
   --primary: var(--brand-primary);
-  --primary-foreground: #fbf4ea;
-  --secondary: rgb(216 154 126 / 0.2);
-  --secondary-foreground: #6f4e37;
-  --muted: rgb(111 78 55 / 0.08);
-  --muted-foreground: #8b7364;
-  --accent: rgb(216 154 126 / 0.25);
-  --accent-foreground: #4a3728;
+  --primary-foreground: #fdfcfa;
+  --secondary: color-mix(in srgb, var(--brand-accent) 18%, transparent);
+  --secondary-foreground: var(--foreground);
+  --muted: color-mix(in srgb, var(--brand-primary) 8%, transparent);
+  --muted-foreground: color-mix(in srgb, var(--brand-primary) 55%, #6b6b6b);
+  --accent: color-mix(in srgb, var(--brand-accent) 22%, transparent);
+  --accent-foreground: var(--foreground);
   --destructive: #b3261e;
-  --border: rgb(111 78 55 / 0.15);
-  --input: rgb(111 78 55 / 0.25);
+  --border: color-mix(in srgb, var(--brand-primary) 15%, transparent);
+  --input: color-mix(in srgb, var(--brand-primary) 25%, transparent);
   --ring: var(--brand-accent);
-  --radius: 1.25rem; /* 20px — soft, no hard edges */
+  --radius: 1.25rem;
 
   --app-font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
   --app-font-heading: var(--font-fraunces), Georgia, serif;
