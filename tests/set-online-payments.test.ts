@@ -32,20 +32,35 @@ describe("set_online_payments", () => {
     noShop = await signedIn(process.env.REGISTER_TEST_EMAIL!, process.env.REGISTER_TEST_PASSWORD!)
     await admin
       .from("shops")
-      .update({ stripe_account_id: "acct_test_connect", payment_modes: ["in_store"] })
+      .update({
+        stripe_account_id: "acct_test_connect",
+        stripe_charges_enabled: true,
+        payment_modes: ["in_store"],
+      })
       .eq("slug", "corner-grind")
   })
 
   afterAll(async () => {
     await admin
       .from("shops")
-      .update({ stripe_account_id: null, payment_modes: ["in_store"] })
+      .update({
+        stripe_account_id: null,
+        stripe_charges_enabled: false,
+        payment_modes: ["in_store"],
+      })
       .eq("slug", "corner-grind")
   })
 
   it("enable without a connected account is rejected", async () => {
     const { error } = await noAcct.rpc("set_online_payments", { p_enabled: true })
     expect(error?.message ?? "").toContain("no_stripe_account")
+  })
+
+  it("enable with an account but charges not enabled is rejected", async () => {
+    await admin.from("shops").update({ stripe_charges_enabled: false }).eq("slug", "corner-grind")
+    const { error } = await withAcct.rpc("set_online_payments", { p_enabled: true })
+    expect(error?.message ?? "").toContain("charges_not_enabled")
+    await admin.from("shops").update({ stripe_charges_enabled: true }).eq("slug", "corner-grind")
   })
 
   it("enable with an account adds 'online' (keeps 'in_store')", async () => {
