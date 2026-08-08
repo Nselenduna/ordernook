@@ -36,7 +36,7 @@ export async function GET(
     scope: `/${slug}`,
     display: "standalone",
     theme_color: b.primary ?? b.accent ?? DEFAULT_BRANDING.primary,
-    background_color: DEFAULT_BRANDING.background,
+    background_color: b.background ?? DEFAULT_BRANDING.background,
     icons,
   }
 
