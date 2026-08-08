@@ -2,6 +2,8 @@ import { NextResponse } from "next/server"
 import type Stripe from "stripe"
 import { getStripe } from "@/lib/stripe"
 import { createAdminClient } from "@/lib/supabase/admin"
+import { chargesSyncUpdate } from "@/lib/connect"
+import type { PaymentMode } from "@/lib/types"
 
 export const runtime = "nodejs"
 
@@ -54,6 +56,25 @@ export async function POST(request: Request) {
       await admin.from("orders")
         .update({ status: "new", stripe_payment_intent_id: (s.payment_intent as string) ?? null })
         .eq("id", orderId).eq("status", "pending_payment") // idempotent guard
+    }
+  }
+
+  if (event.type === "account.updated") {
+    const acct = event.data.object as Stripe.Account
+    const admin = createAdminClient()
+    const { data: shop } = await admin
+      .from("shops")
+      .select("id, payment_modes")
+      .eq("stripe_account_id", acct.id)
+      .maybeSingle()
+    if (shop) {
+      const patch = chargesSyncUpdate(acct.charges_enabled === true, shop.payment_modes ?? [])
+      // chargesSyncUpdate takes/returns string[] (lib/connect.ts is DB-type-agnostic);
+      // narrow back to the shops.payment_modes enum array for the update call.
+      await admin
+        .from("shops")
+        .update({ ...patch, payment_modes: patch.payment_modes as PaymentMode[] })
+        .eq("id", shop.id)
     }
   }
   return NextResponse.json({ received: true })
