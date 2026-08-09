@@ -1,10 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <!-- The Corner Grind — Phase 0 app icon (brand: coffee brown / cream / terracotta).
-       Content sits inside the maskable safe zone (centre 80%). -->
-  <rect width="512" height="512" fill="#6F4E37"/>
-  <path d="M226 100c-12 16 12 26 0 42" stroke="#F6EBDF" stroke-width="16" stroke-linecap="round" fill="none" opacity="0.85"/>
-  <path d="M286 100c-12 16 12 26 0 42" stroke="#F6EBDF" stroke-width="16" stroke-linecap="round" fill="none" opacity="0.85"/>
-  <rect x="148" y="166" width="216" height="36" rx="18" fill="#F6EBDF"/>
-  <path d="M170 216h172l-21 176a26 26 0 0 1-25.8 22h-79.4a26 26 0 0 1-25.8-22z" fill="#F6EBDF"/>
-  <path d="M182 262h148l-8.5 68H190.5z" fill="#D89A7E"/>
+  <!-- OrderNook app icon — Travo Purple palette. Content inside maskable safe zone (centre 80%). -->
+  <rect width="512" height="512" fill="#7B61FF"/>
+  <path d="M226 100c-12 16 12 26 0 42" stroke="#FFFFFF" stroke-width="16" stroke-linecap="round" fill="none" opacity="0.85"/>
+  <path d="M286 100c-12 16 12 26 0 42" stroke="#FFFFFF" stroke-width="16" stroke-linecap="round" fill="none" opacity="0.85"/>
+  <rect x="148" y="166" width="216" height="36" rx="18" fill="#FFFFFF"/>
+  <path d="M170 216h172l-21 176a26 26 0 0 1-25.8 22h-79.4a26 26 0 0 1-25.8-22z" fill="#FFFFFF"/>
+  <path d="M182 262h148l-8.5 68H190.5z" fill="#B8AAFF"/>
 </svg>

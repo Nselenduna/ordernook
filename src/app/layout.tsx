@@ -22,11 +22,14 @@ export const metadata: Metadata = {
   },
   description: t("app.description"),
   manifest: "/manifest.webmanifest",
+  icons: {
+    // Needed for iOS "Add to Home Screen" on dashboard pages (manifest ignored by Safari).
+    apple: "/icons/icon-180.png",
+  },
 };
 
 export const viewport: Viewport = {
-  // Phase 0: hardcoded test-shop brand colour (per-tenant in Phase 1).
-  themeColor: "#6F4E37",
+  themeColor: "#7B61FF",
 };
 
 export default function RootLayout({
