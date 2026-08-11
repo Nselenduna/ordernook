@@ -96,23 +96,28 @@ export function OrderAlertsBanner({ shopId }: { shopId: string }) {
       if (error) throw error
       setState("enabled")
     } catch (err) {
-      // Roll the browser subscription back so a failed enrolment can't
-      // masquerade as a successful one on the next visit — getSubscription()
-      // is our only "already enrolled?" signal, so an orphaned subscription
-      // would hide the banner forever while no staff_push_devices row exists.
-      try {
-        const registration = await navigator.serviceWorker.getRegistration()
-        const orphan = await registration?.pushManager.getSubscription()
-        await orphan?.unsubscribe()
-      } catch {
-        // Best-effort rollback; the error state below is what the user acts on.
+      const enrolledElsewhere =
+        err instanceof Error &&
+        err.message.includes("already enrolled to another shop")
+
+      // Only a subscription pointing at NOTHING is an orphan worth clearing.
+      // Push subscriptions are per-origin — this app has exactly one per
+      // device across all shops — so in the enrolled-elsewhere case the
+      // subscription is the OTHER shop's live, working one. Unsubscribing
+      // here would silently kill alerts for a shop that is working fine.
+      // Only a genuine failure (no shop ends up owning the endpoint) is an
+      // orphan worth clearing, so a retry starts clean next visit.
+      if (!enrolledElsewhere) {
+        try {
+          const registration = await navigator.serviceWorker.getRegistration()
+          const orphan = await registration?.pushManager.getSubscription()
+          await orphan?.unsubscribe()
+        } catch {
+          // Best-effort rollback; the error state below is what the user acts on.
+        }
       }
-      const message = err instanceof Error ? err.message : ""
-      setState(
-        message.includes("already enrolled to another shop")
-          ? "errorEnrolledElsewhere"
-          : "error"
-      )
+
+      setState(enrolledElsewhere ? "errorEnrolledElsewhere" : "error")
     }
   }
 
@@ -142,10 +147,9 @@ export function OrderAlertsBanner({ shopId }: { shopId: string }) {
       <div className="flex-1">
         <p className="font-medium">{t("alerts.title")}</p>
         <p className="mt-0.5 text-sm text-muted-foreground">{message}</p>
-        {(state === "idle" ||
-          state === "working" ||
-          state === "error" ||
-          state === "errorEnrolledElsewhere") && (
+        {/* No retry button for errorEnrolledElsewhere — retrying fails
+            identically every time; the message above is the actionable part. */}
+        {(state === "idle" || state === "working" || state === "error") && (
           <Button
             type="button"
             className="mt-3 h-11 rounded-full"
