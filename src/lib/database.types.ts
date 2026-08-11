@@ -479,6 +479,47 @@ export type Database = {
           },
         ]
       }
+      staff_push_devices: {
+        Row: {
+          auth_user_id: string
+          created_at: string
+          endpoint: string
+          id: string
+          label: string | null
+          last_success_at: string | null
+          shop_id: string
+          subscription: Json
+        }
+        Insert: {
+          auth_user_id: string
+          created_at?: string
+          endpoint: string
+          id?: string
+          label?: string | null
+          last_success_at?: string | null
+          shop_id: string
+          subscription: Json
+        }
+        Update: {
+          auth_user_id?: string
+          created_at?: string
+          endpoint?: string
+          id?: string
+          label?: string | null
+          last_success_at?: string | null
+          shop_id?: string
+          subscription?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_push_devices_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       staff_users: {
         Row: {
           auth_user_id: string
@@ -517,12 +558,16 @@ export type Database = {
         Args: { p_subscription: Json; p_token: string }
         Returns: undefined
       }
+      attach_staff_push_device: {
+        Args: { p_label?: string; p_shop_id: string; p_subscription: Json }
+        Returns: undefined
+      }
       create_order: {
         Args: {
           p_customer_name: string
           p_customer_phone: string
           p_items: Json
-          p_payment_mode: string
+          p_payment_mode?: string
           p_shop_slug: string
         }
         Returns: Json
@@ -532,11 +577,59 @@ export type Database = {
       is_staff_of: { Args: { target_shop: string }; Returns: boolean }
       register_shop: {
         Args: { p_name: string; p_slug: string }
-        Returns: Database["public"]["Tables"]["shops"]["Row"]
+        Returns: {
+          branding: Json
+          country_code: string
+          created_at: string
+          hours: Json
+          id: string
+          is_paused: boolean
+          name: string
+          payment_modes: Database["public"]["Enums"]["payment_mode"][]
+          plan_tier: Database["public"]["Enums"]["plan_tier"]
+          prep_minutes: number
+          slug: string
+          stripe_account_id: string | null
+          stripe_charges_enabled: boolean
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          subscription_status: string
+          trial_ends_at: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "shops"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       set_online_payments: {
         Args: { p_enabled: boolean }
-        Returns: Database["public"]["Tables"]["shops"]["Row"]
+        Returns: {
+          branding: Json
+          country_code: string
+          created_at: string
+          hours: Json
+          id: string
+          is_paused: boolean
+          name: string
+          payment_modes: Database["public"]["Enums"]["payment_mode"][]
+          plan_tier: Database["public"]["Enums"]["plan_tier"]
+          prep_minutes: number
+          slug: string
+          stripe_account_id: string | null
+          stripe_charges_enabled: boolean
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          subscription_status: string
+          trial_ends_at: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "shops"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
     }
     Enums: {
