@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { DashboardNav } from "@/components/dashboard/dashboard-nav"
+import { OrderAlertsBanner } from "@/components/dashboard/order-alerts-banner"
 import { OrderCard } from "@/components/dashboard/order-card"
 import { RejectDialog } from "@/components/dashboard/reject-dialog"
 import { useChime } from "@/components/dashboard/use-chime"
@@ -285,6 +286,7 @@ export function DashboardShell({ shop }: { shop: Tables<"shops"> }) {
       </div>
 
       <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-4 px-4 py-4">
+        <OrderAlertsBanner shopId={shop.id} />
         {!unlocked && !muted && (
           <button
             type="button"

@@ -265,6 +265,15 @@ const dict = {
   "push.newOrderPaid": "Paid online",
   "push.newOrderUnpaid": "Pay on collection",
 
+  // Dashboard order-alerts enrolment banner
+  "alerts.title": "Turn on order alerts",
+  "alerts.body": "Get a notification the moment an order comes in, even with this page closed.",
+  "alerts.button": "Turn on alerts",
+  "alerts.enabled": "Order alerts are on for this device.",
+  "alerts.error": "Couldn't turn on alerts. Try again.",
+  "alerts.installFirst": "Add OrderNook to your Home Screen first, then open it from there to turn on order alerts.",
+  "alerts.dismiss": "Dismiss",
+
   // Menu editor
   "editor.addCategory": "Add category",
   "editor.newCategory": "New category name",
