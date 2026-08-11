@@ -1,5 +1,5 @@
-import { t } from "@/lib/i18n"
-import { formatMinor } from "@/lib/money"
+import { t } from "./i18n"
+import { formatMinor } from "./money"
 
 export type OrderAlertInput = {
   orderNumber: number
