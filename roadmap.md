@@ -1,5 +1,22 @@
 # roadmap.md — OrderNook
 
+## Zero-to-Revenue Roadmap (added 11 Aug 2026)
+
+**Reality check:** product is feature-complete through Phase 2A. Zero real paying shops — only `corner-grind` and `pilot-test`, both Lloyd's own pilots on extended trial. This is a distribution problem, not a build problem.
+
+**🚨 Urgent — live copy is ahead of live product:** ordernook.uk's Basic £12/mo tier already advertises *"Take payment online — card checkout & automatic refunds"*. Per state.md, Phase 2B (Stripe Connect customer payments) is **built + merged, NOT deployed**. Real shops signing up today are being sold a feature that doesn't work yet. Also: the live site shows one £12 tier only — no Pro £25/mo — which contradicts project.md's original two-tier model. Resolve this contradiction before recruiting real shops.
+
+- [ ] **Decide the pricing model, once:** either (a) deploy Phase 2B this week so the £12 tier's payments claim is true, or (b) drop the payments bullet from the landing copy until it ships. Don't recruit real shops while the promise and the product disagree.
+- [ ] If (a): deploy Phase 2B, run one real live Stripe Connect charge + refund to prove it end-to-end (mirrors the Phase 2A live-charge step already noted below).
+- [ ] **First real, non-pilot paying shop.** Walk into 2-3 local shops (café, sandwich place, food stall) with the pilot demo live on your phone. Target: 1 shop signed up to the 30-day trial this week.
+- [ ] Convert that trial shop to paying at day 30 — check in around day 25-28, don't just wait for the trial to lapse silently.
+- [ ] Repeat to 3-5 paying shops before touching new features. Each one is a chance to find the real onboarding friction a non-Lloyd shop owner hits.
+- [ ] Once 3-5 shops are paying, offer Pro/online-payments as an upsell to the ones asking "can customers pay in the app?"
+
+**Weekly budget: 2-3 hrs.** Highest-priority of the three revenue products — shortest path to a first real pound because the pitch (community-native, walk-in) is the one Lloyd's already good at.
+
+---
+
 - **Phase 0 — validate the loop** ← CURRENT. Scaffold, schema+RLS, test shop, menu→cart→pay-in-store order→live dashboard queue→status flow→ready push, PWA basics. No Stripe.
 - **Phase 1 — shop tools (lean pilot-first):** Lloyd hand-onboards 2–3 pilot shops; build the tools they use daily. Sliced:
   - **Slice 1 — Go-Live Kit** ← NEXT (see `phase1-go-live-kit.md`): sold-out toggle, accepting-orders/pause toggle, prep time, QR/link + print poster, allergens (schema + customer display), repeatable pilot seed script. Hours kept simple (no 7-day schedule).

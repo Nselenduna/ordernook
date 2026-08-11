@@ -17,7 +17,8 @@
 - `revoke execute ... from anon` on every new `SECURITY DEFINER` function, matching `is_staff_of` and `attach_push_subscription`.
 - Tests run serially (`fileParallelism:false` in `vitest.config.ts`) against **live** Supabase; occasional cross-file flake is transient — re-run before investigating.
 - The GitHub repo is **public**. No secrets in migrations, code, or committed docs.
-- Supabase project is `iryavyogljedwgllaoit`; the CLI is linked and `supabase db push` works.
+- Supabase project is `iryavyogljedwgllaoit`. **All DB access goes through the CLI** — `npx supabase db push` for migrations, `npx supabase db query --linked` for ad-hoc SQL. **Never use the Supabase MCP on this project:** it is bound to `qihlqywpaszxnxcdkymp`, which is BookOnTheMap production — a different live product.
+- There is one database and it is production. Five real shops and real orders live in it. Scope every test write so it cannot appear in a real shop's queue, and clean up after.
 - Migrations are timestamp-named and live in `supabase/migrations/`. The latest existing is `20260811090000_revoke_trigger_guard_execute.sql`.
 
 ---
@@ -595,35 +596,35 @@ git commit -m "feat(alerts): notify-new-order route with shared-secret guard"
 
 **Why two triggers, not one:** Postgres rejects `OLD` in the `WHEN` clause of an INSERT trigger, and `tg_op` is not available in `WHEN` at all. A combined `AFTER INSERT OR UPDATE ... WHEN (... old.status ...)` therefore fails at creation time. Two triggers sharing one function is the correct construction.
 
+> **Database access rule for every step below.** Use the Supabase **CLI** — `npx supabase db query --linked` and `npx supabase db push`. **Never the Supabase MCP**: it is bound to `qihlqywpaszxnxcdkymp`, which is **BookOnTheMap production**, a different live product. Running these statements through the MCP would install `pg_net` and store OrderNook's push secret in the wrong company database.
+
 - [ ] **Step 1: Confirm the pg_net function schema**
 
 Enabling the extension first, then checking where its functions landed, avoids guessing at a qualified name:
 
-```sql
-create extension if not exists pg_net;
-select n.nspname, p.proname
-from pg_proc p join pg_namespace n on n.oid = p.pronamespace
-where p.proname = 'http_post';
+```bash
+npx supabase db query --linked "create extension if not exists pg_net"
+npx supabase db query --linked "select n.nspname from pg_proc p join pg_namespace n on n.oid = p.pronamespace where p.proname = 'http_post'"
 ```
 
-Run via the Supabase MCP `execute_sql`. Expected: a row with `nspname = 'net'`. If it is not `net`, use the returned schema in Step 3 instead.
+Expected: a row with `nspname = 'net'`. If it is not `net`, use the returned schema in Step 3 instead.
 
 - [ ] **Step 2: Set the Vault secrets**
 
-Never commit these values. Run via the Supabase MCP `execute_sql`, substituting a freshly generated random secret:
-
-```sql
-select vault.create_secret('https://ordernook.uk/api/notify-new-order', 'ordernook_notify_url');
-select vault.create_secret('<GENERATED_SECRET>', 'ordernook_notify_secret');
-```
-
-Generate the secret with:
+Generate the secret:
 
 ```bash
 node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))"
 ```
 
-Keep it — Task 6 sets the identical value in Vercel as `NOTIFY_SHARED_SECRET`.
+**Do not paste the generated value into a chat message, a commit, or any file under version control.** Set it with:
+
+```bash
+npx supabase db query --linked "select vault.create_secret('https://ordernook.uk/api/notify-new-order', 'ordernook_notify_url')"
+npx supabase db query --linked "select vault.create_secret('PASTE_SECRET_HERE', 'ordernook_notify_secret')"
+```
+
+Keep the value to hand — Task 6 Step 1 sets the identical value in Vercel as `NOTIFY_SHARED_SECRET`. If it is lost, re-run both this step (with `vault.update_secret`) and Task 6 Step 1 with a fresh value; a mismatch makes every push silently 401.
 
 - [ ] **Step 3: Write the migration**
 
@@ -700,41 +701,48 @@ Expected: applies cleanly. If it errors with "OLD cannot be referenced", the two
 
 - [ ] **Step 5: Verify the trigger fires exactly once per arrival**
 
-Run via the Supabase MCP `execute_sql`, against the `corner-grind` shop:
+Use `pilot-test`, **not** `corner-grind` — corner-grind is the live demo shop linked from the landing page's "See a live demo" button, and a stray test order in its queue is publicly reachable.
 
-```sql
--- Baseline
-select count(*) as before from net._http_response;
+Each command is a separate CLI invocation so the counts are read between writes:
 
--- An online order must NOT fire on insert at pending_payment
-insert into public.orders (shop_id, status, payment_mode, total_minor, currency, customer_name, order_number, access_token)
-select id, 'pending_payment', 'online', 500, 'GBP', 'Trigger Test', 9001, gen_random_uuid()::text
-from public.shops where slug = 'corner-grind';
-
-select count(*) as after_pending from net._http_response;
+```bash
+npx supabase db query --linked "select count(*) as before from net._http_response"
 ```
 
-Expected: `after_pending` equals `before`.
-
-```sql
--- Flipping to 'new' must fire exactly once
-update public.orders set status = 'new' where order_number = 9001;
-select count(*) as after_flip from net._http_response;
-
--- Re-saving must NOT fire again
-update public.orders set customer_name = 'Trigger Test 2' where order_number = 9001;
-select count(*) as after_resave from net._http_response;
+```bash
+npx supabase db query --linked "insert into public.orders (shop_id, status, payment_mode, total_minor, currency, customer_name, order_number, access_token) select id, 'pending_payment', 'online', 500, 'GBP', 'Trigger Test', 9001, gen_random_uuid()::text from public.shops where slug = 'pilot-test'"
 ```
 
-Expected: `after_flip` = `before` + 1; `after_resave` = `after_flip`.
+```bash
+npx supabase db query --linked "select count(*) as after_pending from net._http_response"
+```
+
+Expected: `after_pending` equals `before` — an order sitting at `pending_payment` must not ping.
+
+```bash
+npx supabase db query --linked "update public.orders set status = 'new' where order_number = 9001"
+npx supabase db query --linked "select count(*) as after_flip from net._http_response"
+```
+
+Expected: `after_flip` = `before` + 1 — exactly one ping when payment reconciles.
+
+```bash
+npx supabase db query --linked "update public.orders set customer_name = 'Trigger Test 2' where order_number = 9001"
+npx supabase db query --linked "select count(*) as after_resave from net._http_response"
+```
+
+Expected: `after_resave` = `after_flip` — a re-save must not ping again.
+
+If `net._http_response` is empty rather than incrementing, check `net.http_request_queue` instead; pg_net moves rows between the two as requests complete.
 
 - [ ] **Step 6: Clean up the test order**
 
-```sql
-delete from public.orders where order_number = 9001;
+```bash
+npx supabase db query --linked "delete from public.orders where order_number = 9001"
+npx supabase db query --linked "select count(*) from public.orders where order_number = 9001"
 ```
 
-Expected: 1 row deleted. Confirm `select count(*) from public.orders where order_number = 9001` returns 0 — this row must not reach a real shop's queue.
+Expected: the count returns 0. This row must not survive in a real shop's queue.
 
 - [ ] **Step 7: Commit**
 
@@ -993,14 +1001,11 @@ Expected: the variable appears in `npx vercel env ls production`.
 
 - [ ] **Step 2: Confirm the Vault secrets are present**
 
-Run via the Supabase MCP `execute_sql`:
-
-```sql
-select name, created_at from vault.secrets
-where name in ('ordernook_notify_url', 'ordernook_notify_secret');
+```bash
+npx supabase db query --linked "select name, created_at from vault.secrets where name in ('ordernook_notify_url','ordernook_notify_secret')"
 ```
 
-Expected: two rows. Do not select `decrypted_secret` — the value must not enter the transcript.
+Expected: two rows. Select only `name` and `created_at` — never `decrypted_secret`, which would print the shared secret into the terminal and the session transcript.
 
 - [ ] **Step 3: Deploy**
 

@@ -145,4 +145,6 @@ Ordered, because the trigger is inert until the secrets exist:
 4. Deploy.
 5. Run the acceptance test.
 
-Migrations reach the DB via the CLI, which is linked to `iryavyogljedwgllaoit`; the Supabase MCP also reaches this project (the "MCP can't reach the Zizwe project" note in state.md is stale).
+**All database access for this project goes through the Supabase CLI**, which is linked to `iryavyogljedwgllaoit`: `supabase db push` for migrations, `supabase db query --linked` for ad-hoc SQL.
+
+**Do not use the Supabase MCP on this project.** It is bound to `qihlqywpaszxnxcdkymp` — **BookOnTheMap production**. The state.md note that the MCP can't reach the Zizwe order-ahead project is correct and current. Running this feature's `create extension`, `vault.create_secret`, or test-order SQL through the MCP would write them into a different live product's database.
