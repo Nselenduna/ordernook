@@ -60,6 +60,11 @@ async function ownShopId(client: SupabaseClient): Promise<string> {
   return (data as { shop_id: string }).shop_id
 }
 
+// All test endpoints share this prefix so cleanup can target ONLY test rows.
+// A blanket delete would wipe real enrolled staff devices on corner-grind —
+// these tests run against live Supabase, not a throwaway database.
+const TEST_ENDPOINT_PREFIX = "https://push.test/"
+
 function fakeSubscription(endpoint: string) {
   return { endpoint, keys: { p256dh: "test-p256dh", auth: "test-auth" } }
 }
@@ -75,8 +80,9 @@ describe("staff_push_devices", () => {
     b = await signedIn(process.env.SHOP_B_EMAIL!, process.env.SHOP_B_PASSWORD!)
     aShopId = await ownShopId(a)
     bShopId = await ownShopId(b)
-    await a.from("staff_push_devices").delete().eq("shop_id", aShopId)
-    await b.from("staff_push_devices").delete().eq("shop_id", bShopId)
+    // Scoped to test endpoints only — never touch real enrolled devices.
+    await a.from("staff_push_devices").delete().like("endpoint", `${TEST_ENDPOINT_PREFIX}%`)
+    await b.from("staff_push_devices").delete().like("endpoint", `${TEST_ENDPOINT_PREFIX}%`)
   })
 
   it("A can enrol a device for its own shop", async () => {
