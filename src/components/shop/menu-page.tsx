@@ -31,7 +31,7 @@ function ItemCard({
       onClick={onSelect}
       disabled={!item.is_available}
       className={cn(
-        "flex w-full items-start justify-between gap-3 rounded-3xl bg-card p-4 text-left shadow-[0_8px_30px_rgba(111,78,55,.12)] ring-1 ring-foreground/5 backdrop-blur-md transition-transform active:translate-y-px",
+        "flex w-full items-start justify-between gap-3 rounded-3xl bg-card p-4 text-left shadow-[0_8px_30px_var(--shadow-brand,rgba(111,78,55,.12))] ring-1 ring-foreground/5 backdrop-blur-md transition-transform active:translate-y-px",
         !item.is_available && "opacity-60"
       )}
     >
@@ -119,7 +119,7 @@ export function MenuPage({
           <img
             src={branding.logo_url}
             alt=""
-            className="mb-3 size-20 rounded-2xl object-cover shadow-[0_8px_30px_rgba(111,78,55,.15)]"
+            className="mb-3 size-20 rounded-2xl object-cover shadow-[0_8px_30px_var(--shadow-brand,rgba(111,78,55,.15))]"
           />
         )}
         <h1 className="font-heading text-4xl font-semibold">{shop.name}</h1>
@@ -141,7 +141,7 @@ export function MenuPage({
                 "h-11 shrink-0 rounded-full px-5 text-sm font-medium transition-colors",
                 activeCategory === category.id
                   ? "bg-primary text-primary-foreground"
-                  : "bg-card text-foreground shadow-[0_4px_16px_rgba(111,78,55,.08)]"
+                  : "bg-accent text-accent-foreground shadow-[0_4px_16px_var(--shadow-brand,rgba(111,78,55,.08))]"
               )}
             >
               {category.name}

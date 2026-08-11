@@ -174,7 +174,7 @@ export function OrderStatusClient({ token }: { token: string }) {
             )}
           </div>
         ) : (
-          <div className="flex flex-col gap-4 rounded-3xl bg-card p-5 shadow-[0_8px_30px_rgba(111,78,55,.12)] backdrop-blur-md">
+          <div className="flex flex-col gap-4 rounded-3xl bg-card p-5 shadow-[0_8px_30px_var(--shadow-brand,rgba(111,78,55,.12))] backdrop-blur-md">
             <StatusStepper status={order.status} />
             <p className="text-center font-medium">
               {t(STATUS_MESSAGE[order.status] ?? "order.status.new")}
@@ -195,7 +195,7 @@ export function OrderStatusClient({ token }: { token: string }) {
 
         {!isFinalStatus(order.status) && <PushCard token={token} />}
 
-        <section className="flex flex-col gap-3 rounded-3xl bg-card p-5 shadow-[0_8px_30px_rgba(111,78,55,.12)] backdrop-blur-md">
+        <section className="flex flex-col gap-3 rounded-3xl bg-card p-5 shadow-[0_8px_30px_var(--shadow-brand,rgba(111,78,55,.12))] backdrop-blur-md">
           <h2 className="font-heading text-lg font-medium">
             {t("order.items")}
           </h2>

@@ -32,7 +32,7 @@ export function CartBar({
       <button
         type="button"
         onClick={onOpen}
-        className="pointer-events-auto mx-auto flex h-14 w-full max-w-md items-center justify-between rounded-full bg-primary px-5 text-primary-foreground shadow-[0_8px_30px_rgba(111,78,55,.3)] transition-transform active:translate-y-px"
+        className="pointer-events-auto mx-auto flex h-14 w-full max-w-md items-center justify-between rounded-full bg-primary px-5 text-primary-foreground shadow-[0_8px_30px_var(--shadow-brand-strong,rgba(111,78,55,.3))] transition-transform active:translate-y-px"
       >
         <span className="flex size-7 items-center justify-center rounded-full bg-primary-foreground/20 text-sm font-bold tabular-nums">
           {count}

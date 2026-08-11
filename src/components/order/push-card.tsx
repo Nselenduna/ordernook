@@ -55,7 +55,7 @@ export function PushCard({ token }: { token: string }) {
   }
 
   return (
-    <div className="flex flex-col gap-3 rounded-3xl bg-card p-4 shadow-[0_8px_30px_rgba(111,78,55,.12)] backdrop-blur-md">
+    <div className="flex flex-col gap-3 rounded-3xl bg-card p-4 shadow-[0_8px_30px_var(--shadow-brand,rgba(111,78,55,.12))] backdrop-blur-md">
       <div className="flex items-start gap-3">
         <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-secondary text-primary">
           <BellIcon className="size-5" />

@@ -188,7 +188,7 @@ export function CheckoutSheet({
                 {lines.map((line) => (
                   <li
                     key={line.key}
-                    className="flex flex-col gap-2 rounded-2xl bg-card/80 p-3 shadow-[0_8px_30px_rgba(111,78,55,.08)] backdrop-blur-md"
+                    className="flex flex-col gap-2 rounded-2xl bg-card/80 p-3 shadow-[0_8px_30px_var(--shadow-brand,rgba(111,78,55,.08))] backdrop-blur-md"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div>
@@ -268,7 +268,7 @@ export function CheckoutSheet({
                   <div
                     role="radiogroup"
                     aria-label={t("cart.payChoice")}
-                    className="flex gap-1 rounded-2xl bg-card/80 p-1 shadow-[0_8px_30px_rgba(111,78,55,.08)] backdrop-blur-md"
+                    className="flex gap-1 rounded-2xl bg-card/80 p-1 shadow-[0_8px_30px_var(--shadow-brand,rgba(111,78,55,.08))] backdrop-blur-md"
                   >
                     <button
                       type="button"

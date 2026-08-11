@@ -144,12 +144,16 @@
   --secondary-foreground: var(--foreground);
   --muted: color-mix(in srgb, var(--brand-primary) 8%, transparent);
   --muted-foreground: color-mix(in srgb, var(--brand-primary) 55%, #6b6b6b);
-  --accent: color-mix(in srgb, var(--brand-accent) 22%, transparent);
+  --accent: color-mix(in srgb, var(--brand-accent) 30%, transparent);
   --accent-foreground: var(--foreground);
   --destructive: #b3261e;
   --border: color-mix(in srgb, var(--brand-primary) 15%, transparent);
   --input: color-mix(in srgb, var(--brand-primary) 25%, transparent);
   --ring: var(--brand-accent);
+  /* Palette-aware drop shadows (consumed via shadow-[…var(--shadow-brand,<brown fallback>)…]).
+     The fallback keeps portalled popups outside .theme-latte on their old tint. */
+  --shadow-brand: color-mix(in srgb, var(--brand-primary) 12%, transparent);
+  --shadow-brand-strong: color-mix(in srgb, var(--brand-primary) 30%, transparent);
   --radius: 1.25rem;
 
   --app-font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
