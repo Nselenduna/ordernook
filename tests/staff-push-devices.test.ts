@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, it } from "vitest"
+import { afterAll, beforeAll, describe, expect, it } from "vitest"
 import { createClient, type SupabaseClient } from "@supabase/supabase-js"
 import { config } from "dotenv"
 
@@ -95,5 +95,36 @@ describe("staff_push_devices", () => {
       p_label: null,
     })
     expect(error).not.toBeNull()
+  })
+
+  // Regression for a hijack: B staffs only shop B. Before the fix, calling the
+  // RPC with an endpoint already enrolled to A silently reassigned that row's
+  // shop_id/auth_user_id to B — the only gate was is_staff_of(p_shop_id), the
+  // TARGET shop, not any check on the shop that already owns the row. That
+  // physical device would then start receiving B's order alerts instead of A's.
+  it("B CANNOT hijack A's device by re-enrolling A's endpoint under B's shop", async () => {
+    const endpoint = `https://push.test/hijack-${Date.now()}`
+    await a.rpc("attach_staff_push_device", {
+      p_shop_id: aShopId,
+      p_subscription: fakeSubscription(endpoint),
+      p_label: "A's device",
+    })
+    const { error } = await b.rpc("attach_staff_push_device", {
+      p_shop_id: bShopId,
+      p_subscription: fakeSubscription(endpoint),
+      p_label: "Hijacked",
+    })
+    expect(error).not.toBeNull()
+    // A's row must be untouched — still owned by A's shop.
+    const { data } = await a.from("staff_push_devices").select("shop_id").eq("endpoint", endpoint)
+    expect(data).toHaveLength(1)
+    expect(data![0].shop_id).toBe(aShopId)
+  })
+
+  afterAll(async () => {
+    // Leave the production table as clean as we found it — don't let test
+    // rows accumulate between runs.
+    await a.from("staff_push_devices").delete().like("endpoint", `${TEST_ENDPOINT_PREFIX}%`)
+    await b.from("staff_push_devices").delete().like("endpoint", `${TEST_ENDPOINT_PREFIX}%`)
   })
 })
