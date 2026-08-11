@@ -261,6 +261,9 @@ const dict = {
   // Web push payload (rendered server-side in /api/notify-ready)
   "push.readyTitle": "{shop} — order #{number}",
   "push.readyBody": "Your order is ready to collect!",
+  "push.newOrderTitle": "New order #{number} — {total}",
+  "push.newOrderPaid": "Paid online",
+  "push.newOrderUnpaid": "Pay on collection",
 
   // Menu editor
   "editor.addCategory": "Add category",
