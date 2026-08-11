@@ -1,5 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import { DM_Sans, Fraunces, Inter, Plus_Jakarta_Sans } from "next/font/google";
+import {
+  DM_Sans,
+  Fraunces,
+  Inter,
+  Plus_Jakarta_Sans,
+  Poppins,
+} from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import { SwRegister } from "@/components/pwa/sw-register";
 import { t } from "@/lib/i18n";
@@ -14,6 +20,12 @@ const jakarta = Plus_Jakarta_Sans({
   variable: "--font-jakarta",
 });
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+// Kupa Green (marketing site)
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["500", "600", "700", "800"],
+  variable: "--font-poppins",
+});
 
 export const metadata: Metadata = {
   title: {
@@ -40,7 +52,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${fraunces.variable} ${dmSans.variable} ${jakarta.variable} ${inter.variable} h-full antialiased`}
+      className={`${fraunces.variable} ${dmSans.variable} ${jakarta.variable} ${inter.variable} ${poppins.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
         {children}

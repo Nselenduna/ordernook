@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import QRCode from "qrcode"
+import { Eye, EyeOff } from "lucide-react"
 import { toast } from "sonner"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { t } from "@/lib/i18n"
@@ -15,6 +16,7 @@ export function shopUrl(slug: string): string {
 export function QrPanel({ slug }: { slug: string }) {
   const url = shopUrl(slug)
   const [png, setPng] = useState<string>("")
+  const [linkVisible, setLinkVisible] = useState(false)
 
   useEffect(() => {
     QRCode.toDataURL(url, { width: 512, margin: 2 }).then(setPng).catch(() => {})
@@ -39,7 +41,23 @@ export function QrPanel({ slug }: { slug: string }) {
           className="size-56 rounded-2xl border border-border bg-white p-3"
         />
       )}
-      <p className="break-all text-sm text-muted-foreground">{url}</p>
+      <button
+        type="button"
+        onClick={() => setLinkVisible((v) => !v)}
+        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+      >
+        {linkVisible ? (
+          <>
+            <EyeOff className="size-4" strokeWidth={2} />
+            <span className="break-all">{url}</span>
+          </>
+        ) : (
+          <>
+            <Eye className="size-4" strokeWidth={2} />
+            Show link
+          </>
+        )}
+      </button>
       <div className="flex flex-wrap items-center justify-center gap-2">
         {/* Button (base-ui) has no `asChild` prop, so these two links are
             styled manually with buttonVariants to match Button's look. */}

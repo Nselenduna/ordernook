@@ -192,6 +192,57 @@
     system-ui, sans-serif;
 }
 
+/* ---------------------------------------------------------------------------
+   Kupa Green — marketing site theme (ordernook.uk landing page). Fresh &
+   trustworthy: lots of white, green reserved for CTAs and headers. Scoped to
+   the marketing page wrapper so it never leaks into the app. */
+.theme-kupa {
+  --brand-green: #1d6f4c;
+  --brand-dark: #14532d;
+  /* Warm amber accent — pairs with the green logo, used for eyebrows, step
+     numbers and small pops of colour so headings aren't all flat black. */
+  --brand-amber: #d97706;
+  --brand-amber-dark: #92400e;
+  --brand-amber-bg: #fef3e2;
+
+  --background: #ffffff;
+  --foreground: #1a1a1a;
+  --card: #ffffff;
+  --card-foreground: #1a1a1a;
+  --popover: #ffffff;
+  --popover-foreground: #1a1a1a;
+  --primary: #1d6f4c;
+  --primary-foreground: #ffffff;
+  --secondary: #f6f4ef; /* warm off-white for alternating sections */
+  --secondary-foreground: #1a1a1a;
+  --muted: #f6f4ef;
+  --muted-foreground: #7a7a72;
+  --accent: #eaf4ee; /* pale green chip */
+  --accent-foreground: #14532d;
+  --destructive: #dc2626;
+  --border: #eceae4; /* hairline */
+  --input: #eceae4;
+  --ring: #1d6f4c;
+  --radius: 0.75rem; /* 12px cards */
+
+  --app-font-heading: var(--font-poppins), var(--font-inter), ui-sans-serif,
+    system-ui, sans-serif;
+  --app-font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Glossy 3D green pill — same gloss treatment as the ON logo mark, reused for
+   tags/chips that need to pop against the white Kupa Green background. */
+.theme-kupa .pill-glossy {
+  background: linear-gradient(180deg, #63c23a 0%, #33a00f 55%, #1c7d06 100%);
+  border: 1px solid #0c5200;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -6px 10px rgba(12, 82, 0, 0.25),
+    0 2px 6px rgba(12, 82, 0, 0.22);
+  color: #ffffff;
+  text-shadow: 0 1px 1px rgba(12, 82, 0, 0.4);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

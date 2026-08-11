@@ -17,6 +17,7 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { t } from "@/lib/i18n";
 import { createClient } from "@/lib/supabase/client";
+import { OnPill } from "@/components/marketing/on-logo";
 
 export default function DashboardLoginPage() {
   const router = useRouter();
@@ -44,10 +45,13 @@ export default function DashboardLoginPage() {
   };
 
   return (
-    <main className="theme-travo flex flex-1 flex-col items-center justify-center bg-background px-4 text-foreground">
-      <Card className="w-full max-w-sm shadow-[0_4px_16px_rgba(123,97,255,.10)] ring-0">
+    <main className="theme-kupa flex flex-1 flex-col items-center justify-center bg-background px-4 text-foreground">
+      <Link href="/" aria-label="OrderNook home" className="mb-6">
+        <OnPill height={48} />
+      </Link>
+      <Card className="w-full max-w-sm shadow-[0_4px_16px_rgba(29,111,76,.10)] ring-0">
         <CardHeader>
-          <CardTitle className="font-heading text-xl">
+          <CardTitle className="font-heading text-xl text-[color:var(--brand-dark)]">
             {t("login.title")}
           </CardTitle>
           <CardDescription>{t("login.subtitle")}</CardDescription>
