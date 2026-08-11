@@ -14,10 +14,11 @@ type State =
   | "working"
   | "enabled"
   | "error"
+  | "errorEnrolledElsewhere"
   | "needsInstall"
   | "hidden"
 
-const DISMISS_KEY = "on-alerts-dismissed"
+const DISMISS_KEY = "oa-alerts-dismissed"
 
 /**
  * iOS only delivers web push to an installed home-screen PWA (16.4+), and
@@ -94,8 +95,24 @@ export function OrderAlertsBanner({ shopId }: { shopId: string }) {
       })
       if (error) throw error
       setState("enabled")
-    } catch {
-      setState("error")
+    } catch (err) {
+      // Roll the browser subscription back so a failed enrolment can't
+      // masquerade as a successful one on the next visit — getSubscription()
+      // is our only "already enrolled?" signal, so an orphaned subscription
+      // would hide the banner forever while no staff_push_devices row exists.
+      try {
+        const registration = await navigator.serviceWorker.getRegistration()
+        const orphan = await registration?.pushManager.getSubscription()
+        await orphan?.unsubscribe()
+      } catch {
+        // Best-effort rollback; the error state below is what the user acts on.
+      }
+      const message = err instanceof Error ? err.message : ""
+      setState(
+        message.includes("already enrolled to another shop")
+          ? "errorEnrolledElsewhere"
+          : "error"
+      )
     }
   }
 
@@ -111,9 +128,11 @@ export function OrderAlertsBanner({ shopId }: { shopId: string }) {
       ? t("alerts.enabled")
       : state === "error"
         ? t("alerts.error")
-        : state === "needsInstall"
-          ? t("alerts.installFirst")
-          : t("alerts.body")
+        : state === "errorEnrolledElsewhere"
+          ? t("alerts.errorEnrolledElsewhere")
+          : state === "needsInstall"
+            ? t("alerts.installFirst")
+            : t("alerts.body")
 
   return (
     <div className="flex items-start gap-3 rounded-2xl border border-border bg-card p-4">
@@ -123,7 +142,10 @@ export function OrderAlertsBanner({ shopId }: { shopId: string }) {
       <div className="flex-1">
         <p className="font-medium">{t("alerts.title")}</p>
         <p className="mt-0.5 text-sm text-muted-foreground">{message}</p>
-        {(state === "idle" || state === "working" || state === "error") && (
+        {(state === "idle" ||
+          state === "working" ||
+          state === "error" ||
+          state === "errorEnrolledElsewhere") && (
           <Button
             type="button"
             className="mt-3 h-11 rounded-full"
