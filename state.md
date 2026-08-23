@@ -7,9 +7,11 @@ The product is **feature-complete and live at ordernook.uk**. Phases 0, 1, 2A an
 
 **Zero real paying shops.** `corner-grind` and `pilot-test` are both Lloyd's own pilots on a hand-set 2027 trial. This has been a distribution problem, not a build problem, since 12 Aug — see `roadmap.md` and `walk-in-kit.md`.
 
+**Shipped 23 Aug 2026:** legal pages (`/terms`, `/privacy`, footer repointed off the zizweit.uk soft-404s — merge `dfbf49a`) and **shop order alerts** (merge `a7be5e2`). The alerts DB half had been live alone since 11 Aug, POSTing to a route that did not exist; the route is now deployed and returns 401 without a valid secret.
+
 Open engineering, in order:
-1. **Order alerts Task 6** — deploy + prove on a real iPhone (`feat/shop-order-alerts`, pushed to origin; Tasks 1–5 built and reviewed). Until this ships, a shop with the dashboard tab closed misses orders.
-2. **Legal pages** — `/terms` + `/privacy` on `feat/legal-pages`, footer repointed off the `zizweit.uk` soft-404s.
+1. **Order alerts Task 6, Steps 5–7** — enrol a real iPhone (Add to Home Screen from `ordernook.uk/dashboard`), place an order, confirm the notification, then the paid-online variant. **The Vercel `NOTIFY_SHARED_SECRET` has not been proven to match the Vault `ordernook_notify_secret`** — it cannot be read back (`permission denied for function _crypto_aead_det_decrypt`), and a mismatch is a silent 401 that looks exactly like "no orders yet". Proof is the status code of the first real order's trigger call: `select status_code, count(*), max(created) from net._http_response group by status_code order by 3 desc;` — 200 good, 401 means regenerate and set both sides.
+2. No solicitor has reviewed `/terms` or `/privacy`; both carry a code comment saying so.
 3. Housekeeping: delete the leftover TEST Stripe webhook endpoint `we_1U0SmG…`, which points at the prod URL and 400s on test events (harmless noise).
 
 **Anything dated below is a historical log entry, true as at its own date.** Where it disagrees with git or Vercel, git and Vercel win — that mismatch cost a whole session on 11 Aug.

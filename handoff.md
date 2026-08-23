@@ -4,13 +4,15 @@
 - **Phase 2A subscriptions** — LIVE in production, self-healing (reconcile-on-return + live Stripe webhook).
 - **Slice 4 self-serve registration** — SHIPPED & LIVE at `ordernook.uk/dashboard/register`.
 - **Phase 2B customer online payments** — **SHIPPED, LIVE, AND PROVEN WITH REAL MONEY (12 Aug 2026).** `corner-grind` completed Connect onboarding, took a genuine £2.80 card charge, was rejected, and auto-refunded. Every link in the chain is verified, not just deployed.
-- **Shop order alerts (push-to-staff)** — Tasks 1–5 built and reviewed on `feat/shop-order-alerts` (pushed to origin 23 Aug). **Task 6 — deploy + prove on a real iPhone — not started.** This is the last unfinished build work.
-- **Legal pages** — `/terms` and `/privacy` written on `feat/legal-pages`; footer repointed off the `zizweit.uk` soft-404s.
+- **Shop order alerts (push-to-staff)** — **DEPLOYED 23 Aug** (merge `a7be5e2`). Route `/api/notify-new-order` live and returning 401 without a valid secret; `NOTIFY_SHARED_SECRET` set in Vercel. **Remaining: Task 6 Steps 5–7** — enrol a real iPhone, place an order, confirm the notification and the paid-online variant. The secret match is unproven (see `state.md`); the first real order's row in `net._http_response` is the evidence — 200 good, 401 means the Vercel and Vault values differ.
+- **Legal pages** — **DEPLOYED 23 Aug** (merge `dfbf49a`). `/terms` and `/privacy` live, footer repointed off the `zizweit.uk` soft-404s. No solicitor review yet.
 
 > **Doc-drift warning (the lesson from 11 Aug).** This file previously said Phase 2B was "NOT deployed" for over a week after it had actually shipped, which sent a later session chasing a problem that did not exist. **Trust git and Vercel over this file.** If they disagree, this file is the one that is wrong — fix it in the same sitting.
 
 ## ▶ IMMEDIATE NEXT ACTION
-The product has no gaps against the sales pitch. What is left is distribution — see `roadmap.md` and `walk-in-kit.md`. The one piece of unfinished engineering is **Task 6 of the order-alerts plan** (`docs/superpowers/plans/2026-08-11-shop-order-alerts.md`), which needs a real iPhone and two secrets in Vercel; without it a shop with the dashboard tab closed silently misses orders, which the walk-in pitch promises will not happen.
+Enrol a real iPhone and place one test order — Task 6 Steps 5–7 of `docs/superpowers/plans/2026-08-11-shop-order-alerts.md`. That is the only thing standing between the current state and the walk-in, because the pitch in `walk-in-kit.md` promises an order "lands straight on a screen here" and nothing has yet confirmed a device actually buzzes.
+
+After that the product has no gaps against the pitch, and everything left is distribution — see `roadmap.md` and `walk-in-kit.md`.
 
 ## Project
 `C:\Users\lloyd\OneDrive\Desktop\Projexts 2025\OrderNook\order-ahead`
