@@ -9,10 +9,26 @@
 
 > **Doc-drift warning (the lesson from 11 Aug).** This file previously said Phase 2B was "NOT deployed" for over a week after it had actually shipped, which sent a later session chasing a problem that did not exist. **Trust git and Vercel over this file.** If they disagree, this file is the one that is wrong — fix it in the same sitting.
 
-## ▶ IMMEDIATE NEXT ACTION
-Enrol a real iPhone and place one test order — Task 6 Steps 5–7 of `docs/superpowers/plans/2026-08-11-shop-order-alerts.md`. That is the only thing standing between the current state and the walk-in, because the pitch in `walk-in-kit.md` promises an order "lands straight on a screen here" and nothing has yet confirmed a device actually buzzes.
+## ▶ IMMEDIATE NEXT ACTION (morning of 24 Aug, ~20 minutes)
+
+**Enrol a staff device on the iPhone.** Everything else in the alerts chain is proven; this one link is not.
+
+1. Delete the OrderNook home-screen icon on the iPhone, re-add it from Safari (Share → Add to Home Screen), open it **from the icon**, sign in as corner-grind.
+2. The "Turn on order alerts" banner should now appear. Tap it.
+3. Place an order on `ordernook.uk/corner-grind` from a **different** device.
+4. Confirm the iPhone buzzes, then verify the row exists:
+   `select shop_id, label, last_success_at from staff_push_devices;`
+
+**Why the re-add is needed:** `src/components/dashboard/order-alerts-banner.tsx:67` hides the banner whenever `pushManager.getSubscription()` returns anything. The customer ordering page and the dashboard share one service-worker registration on `ordernook.uk`, so a phone that ever subscribed as a *customer* never sees the staff banner. Deleting and re-adding the PWA clears that registration.
+
+**Then decide (recommended):** fix that check properly. It should test whether *this endpoint* is in `staff_push_devices` for this shop, not whether any subscription exists. As written, a real shop owner who ever tested their own ordering page from the till phone will never be offered the enrolment prompt.
 
 After that the product has no gaps against the pitch, and everything left is distribution — see `roadmap.md` and `walk-in-kit.md`.
+
+## State as at end of 23 Aug (verified, not assumed)
+- Secret match **PROVEN**: order #1 on corner-grind at `22:24:49.081Z` → trigger fired 89ms later → `net._http_response` shows **200**, not 401.
+- Staff enrolment **NOT proven**: `staff_push_devices` is empty, so that 200 was `{sent: 0, pruned: 0}` — nobody enrolled. The notification seen on the phone was the *customer* "order ready" push, which has worked since Phase 0.
+- `net._http_response` rows age out after ~6 hours, so last night's evidence will be gone by morning. Re-testing regenerates it.
 
 ## Project
 `C:\Users\lloyd\OneDrive\Desktop\Projexts 2025\OrderNook\order-ahead`
