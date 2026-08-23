@@ -1,5 +1,25 @@
 # roadmap.md — OrderNook
 
+## Zero-to-Revenue Roadmap (added 11 Aug 2026, corrected 12 Aug 2026)
+
+**Reality check:** product is feature-complete through **Phase 2B** (not just 2A as first thought). Verified 12 Aug directly against git + Vercel, not against the project's own docs: all Connect commits (onboarding, checkout-order, refund-order, connect-webhook) are merged to `master` and **deployed to production**; `STRIPE_CONNECT_CLIENT_ID` + `STRIPE_CONNECT_WEBHOOK_SECRET` are set in Vercel production (added ~8 Aug). The single-£12-tier landing copy (payments folded into Basic) was a deliberate pricing simplification (commit `ead609f`), not a bug — no Pro/Basic split exists in code anymore, and the copy matches that on purpose.
+
+**⚠️ Docs vs. reality gap (fix when convenient, not urgent):** `state.md` and `handoff.md` both still say Phase 2B is "built, merged, NOT deployed" — that's stale from the 3-6 Aug sessions and was never updated after the actual ship. This is exactly why the 11 Aug version of this roadmap wrongly flagged a "live copy is ahead of product" problem — it doesn't exist. Update state.md/handoff.md to reflect Phase 2B as shipped so this doesn't happen again.
+
+Zero real paying shops either way — only `corner-grind` and `pilot-test`, both Lloyd's own pilots on extended trial. **This was never a build problem; it's purely distribution now.**
+
+**RESOLVED 12 Aug 2026 — Phase 2B fully proven live with real money.** `corner-grind` completed Stripe Connect onboarding, "Accept online orders" switched on, and a genuine end-to-end test ran on production: customer checkout offered "Pay online now" → real £2.80 charge captured, showed "Paid online" on the dashboard → rejected → **auto-refunded**, showed "Refunded". Every link in the Phase 2B chain (onboarding → toggle → checkout → capture → reject → refund) is now verified working, not just deployed. `pilot-test` still hasn't gone through this — low priority, `corner-grind` alone is enough to demo to real shops.
+
+- [x] ~~Turn online payments on for corner-grind~~ — done, live-tested with a real transaction + refund (12 Aug).
+- [ ] **First real, non-pilot paying shop.** Walk into 2-3 local shops (café, sandwich place, food stall) with the pilot demo live on your phone — once corner-grind's online payments are on, the full pitch (zero commission, pay in-store or online) is demonstrable, not just promised. Target: 1 shop signed up to the 30-day trial this week.
+- [ ] Convert that trial shop to paying at day 30 — check in around day 25-28, don't just wait for the trial to lapse silently.
+- [ ] Repeat to 3-5 paying shops before touching new features. Each one is a chance to find the real onboarding friction a non-Lloyd shop owner hits.
+- [ ] Tidy state.md/handoff.md to say Phase 2B is shipped (5-minute doc fix, do it in the same sitting as the next real update so it doesn't drift again).
+
+**Weekly budget: 2-3 hrs.** Highest-priority of the three revenue products — shortest path to a first real pound because the pitch (community-native, walk-in) is the one Lloyd's already good at, and the product now has zero gaps against that pitch.
+
+---
+
 - **Phase 0 — validate the loop** ← CURRENT. Scaffold, schema+RLS, test shop, menu→cart→pay-in-store order→live dashboard queue→status flow→ready push, PWA basics. No Stripe.
 - **Phase 1 — shop tools (lean pilot-first):** Lloyd hand-onboards 2–3 pilot shops; build the tools they use daily. Sliced:
   - **Slice 1 — Go-Live Kit** ← NEXT (see `phase1-go-live-kit.md`): sold-out toggle, accepting-orders/pause toggle, prep time, QR/link + print poster, allergens (schema + customer display), repeatable pilot seed script. Hours kept simple (no 7-day schedule).
