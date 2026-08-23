@@ -1,8 +1,20 @@
 # state.md — OrderNook
 
-**Updated:** 11 Jul 2026 (session in progress)
+**Updated:** 23 Aug 2026
 
-## Where we are
+## Where we are (read this first — the dated log below is history)
+The product is **feature-complete and live at ordernook.uk**. Phases 0, 1, 2A and 2B are all shipped. Phase 2B (customer online payments) was proven on 12 Aug 2026 with a real £2.80 charge, reject, and automatic refund on `corner-grind`.
+
+**Zero real paying shops.** `corner-grind` and `pilot-test` are both Lloyd's own pilots on a hand-set 2027 trial. This has been a distribution problem, not a build problem, since 12 Aug — see `roadmap.md` and `walk-in-kit.md`.
+
+Open engineering, in order:
+1. **Order alerts Task 6** — deploy + prove on a real iPhone (`feat/shop-order-alerts`, pushed to origin; Tasks 1–5 built and reviewed). Until this ships, a shop with the dashboard tab closed misses orders.
+2. **Legal pages** — `/terms` + `/privacy` on `feat/legal-pages`, footer repointed off the `zizweit.uk` soft-404s.
+3. Housekeeping: delete the leftover TEST Stripe webhook endpoint `we_1U0SmG…`, which points at the prod URL and 400s on test events (harmless noise).
+
+**Anything dated below is a historical log entry, true as at its own date.** Where it disagrees with git or Vercel, git and Vercel win — that mismatch cost a whole session on 11 Aug.
+
+## Where we were (11 Jul 2026)
 Phase 0 build underway. Infra done, app code in progress.
 
 ## Done this session
