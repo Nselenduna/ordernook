@@ -35,22 +35,18 @@ export function SiteFooter() {
             >
               Sign in
             </Link>
-            <a
-              href="https://zizweit.uk"
-              target="_blank"
-              rel="noreferrer"
+            <Link
+              href="/privacy"
               className="text-muted-foreground hover:text-foreground"
             >
               Privacy
-            </a>
-            <a
-              href="https://zizweit.uk"
-              target="_blank"
-              rel="noreferrer"
+            </Link>
+            <Link
+              href="/terms"
               className="text-muted-foreground hover:text-foreground"
             >
               Terms
-            </a>
+            </Link>
             <a
               href="mailto:support@zizweit.uk"
               className="text-muted-foreground hover:text-foreground"
