@@ -38,6 +38,15 @@ export const metadata: Metadata = {
     // Needed for iOS "Add to Home Screen" on dashboard pages (manifest ignored by Safari).
     apple: "/icons/icon-180.png",
   },
+  // Without this, iOS never treats an installed icon as a real standalone
+  // app — "Add to Home Screen" degrades to an ordinary Safari bookmark, so
+  // navigator.standalone/display-mode never flips and the manifest's
+  // start_url is not reliably honoured either.
+  appleWebApp: {
+    capable: true,
+    title: t("app.name"),
+    statusBarStyle: "default",
+  },
 };
 
 export const viewport: Viewport = {
