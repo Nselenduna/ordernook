@@ -1,0 +1,52 @@
+name: CI
+
+# Runs a typecheck and a production build on every push and PR so a broken
+# import or an undefined reference (e.g. ORDERNOOK-5 / ORDERNOOK-6) is caught
+# before it reaches a deploy. Integration tests are NOT run here: they hit one
+# shared live Supabase and mutate shop fixtures (see vitest.config.ts), so they
+# must stay a local/manual step.
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: [master]
+
+# A newer push to the same branch cancels the older in-flight run.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Build
+        run: npm run build
+        env:
+          # Placeholders only. The build must not depend on real secrets; these
+          # keep any `process.env.X!` guard from tripping during static
+          # generation. Real values live in the Vercel build env.
+          NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder-anon-key
+          NEXT_PUBLIC_APP_URL: https://ordernook.uk
+          NEXT_PUBLIC_SHOP_SLUG: corner-grind
+          NEXT_PUBLIC_SENTRY_DSN: ""
+          SENTRY_AUTH_TOKEN: ""
+
+      - name: Lint (non-blocking)
+        run: npm run lint
+        continue-on-error: true
